@@ -56,6 +56,8 @@ export default function Nav() {
         className="md:hidden flex flex-col gap-1.5 p-2"
         onClick={() => setMobileOpen(!mobileOpen)}
         aria-label="Toggle menu"
+        aria-expanded={mobileOpen}
+        aria-controls="mobile-menu"
       >
         <span
           className={`block w-5 h-px bg-text-primary transition-all duration-300 ${
@@ -76,7 +78,7 @@ export default function Nav() {
 
       {/* Mobile menu */}
       {mobileOpen && (
-        <div className="absolute top-full left-0 right-0 bg-[rgba(10,10,10,0.97)] backdrop-blur-[20px] border-b border-[rgba(255,255,255,0.06)] md:hidden">
+        <div id="mobile-menu" className="absolute top-full left-0 right-0 bg-[rgba(10,10,10,0.97)] backdrop-blur-[20px] border-b border-[rgba(255,255,255,0.06)] md:hidden">
           <ul className="flex flex-col p-6 gap-6 list-none">
             {navLinks.map((link) => (
               <li key={link.label}>

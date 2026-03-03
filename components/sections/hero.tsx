@@ -24,6 +24,7 @@ export default function Hero({ settings }: { settings: SiteSettings }) {
             className="w-full h-full"
             allow="autoplay; fullscreen"
             allowFullScreen
+            title={settings.heroTitle ? `${settings.heroTitle} — showreel` : "Hero showreel video"}
           />
         ) : (
           <div

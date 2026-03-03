@@ -2,7 +2,7 @@ import { MetadataRoute } from "next";
 import { groq } from "next-sanity";
 import { sanityFetch } from "@/sanity/lib/live";
 
-async function getPostsSitemap(): Promise<MetadataRoute.Sitemap> {
+async function getPostsSitemap(baseUrl: string): Promise<MetadataRoute.Sitemap> {
   const postsQuery = groq`
     *[_type == 'post'] | order(_updatedAt desc) {
       'url': $baseUrl + '/blog/' + slug.current,
@@ -14,15 +14,13 @@ async function getPostsSitemap(): Promise<MetadataRoute.Sitemap> {
 
   const { data } = await sanityFetch({
     query: postsQuery,
-    params: {
-      baseUrl: process.env.NEXT_PUBLIC_SITE_URL,
-    },
+    params: { baseUrl },
   });
 
   return data;
 }
 
-async function getPagesSitemap(): Promise<MetadataRoute.Sitemap> {
+async function getPagesSitemap(baseUrl: string): Promise<MetadataRoute.Sitemap> {
   const pagesQuery = groq`
     *[
       _type == 'page' &&
@@ -40,9 +38,7 @@ async function getPagesSitemap(): Promise<MetadataRoute.Sitemap> {
 
   const { data } = await sanityFetch({
     query: pagesQuery,
-    params: {
-      baseUrl: process.env.NEXT_PUBLIC_SITE_URL,
-    },
+    params: { baseUrl },
   });
 
   return data;
@@ -50,7 +46,7 @@ async function getPagesSitemap(): Promise<MetadataRoute.Sitemap> {
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://alanxai.com";
-  const [pages, posts] = await Promise.all([getPagesSitemap(), getPostsSitemap()]);
+  const [pages, posts] = await Promise.all([getPagesSitemap(baseUrl), getPostsSitemap(baseUrl)]);
 
   const staticPages: MetadataRoute.Sitemap = [
     {
