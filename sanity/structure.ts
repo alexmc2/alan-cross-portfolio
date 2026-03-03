@@ -1,89 +1,65 @@
 // sanity/structure.ts
-import { orderableDocumentListDeskItem } from "@sanity/orderable-document-list";
 import {
-  Files,
-  BookA,
-  User,
-  ListCollapse,
-  Quote,
-  Menu,
   Settings,
-  Newspaper,
+  Film,
+  Briefcase,
+  Files,
+  FileText,
+  Link,
 } from "lucide-react";
 
-export const structure = (S: any, context: any) =>
+export const structure = (S: any) =>
   S.list()
     .title("Content")
     .items([
-      orderableDocumentListDeskItem({
-        type: "page",
-        title: "Pages",
-        icon: Files,
-        S,
-        context,
-      }),
       S.listItem()
-        .title("News")
-        .icon(Newspaper)
-        .child(
-          S.list()
-            .title("News")
-            .items([
-              S.listItem()
-                .title("Posts")
-                .schemaType("post")
-                .child(
-                  S.documentTypeList("post")
-                    .title("Posts")
-                    .defaultOrdering([{ field: "_createdAt", direction: "desc" }])
-                ),
-              orderableDocumentListDeskItem({
-                type: "category",
-                title: "Categories",
-                icon: BookA,
-                S,
-                context,
-              }),
-              orderableDocumentListDeskItem({
-                type: "author",
-                title: "Authors",
-                icon: User,
-                S,
-                context,
-              }),
-            ])
-        ),
-      orderableDocumentListDeskItem({
-        type: "faq",
-        title: "FAQs",
-        icon: ListCollapse,
-        S,
-        context,
-      }),
-      orderableDocumentListDeskItem({
-        type: "testimonial",
-        title: "Testimonials",
-        icon: Quote,
-        S,
-        context,
-      }),
-      S.divider(),
-      S.listItem()
-        .title("Navigation")
-        .icon(Menu)
-        .child(
-          S.editor()
-            .id("navigation")
-            .schemaType("navigation")
-            .documentId("navigation")
-        ),
-      S.listItem()
-        .title("Settings")
+        .title("Site Settings")
         .icon(Settings)
         .child(
           S.editor()
-            .id("settings")
-            .schemaType("settings")
-            .documentId("settings")
+            .id("siteSettings")
+            .schemaType("siteSettings")
+            .documentId("siteSettings")
+        ),
+      S.divider(),
+      S.listItem()
+        .title("Portfolio")
+        .icon(Film)
+        .child(
+          S.documentTypeList("portfolioItem")
+            .title("Portfolio Items")
+            .defaultOrdering([{ field: "order", direction: "asc" }])
+        ),
+      S.listItem()
+        .title("Services")
+        .icon(Briefcase)
+        .child(
+          S.documentTypeList("service")
+            .title("Services")
+            .defaultOrdering([{ field: "order", direction: "asc" }])
+        ),
+      S.listItem()
+        .title("Pages")
+        .icon(Files)
+        .child(
+          S.documentTypeList("page")
+            .title("Pages")
+            .defaultOrdering([{ field: "title", direction: "asc" }])
+        ),
+      S.listItem()
+        .title("Blog")
+        .icon(FileText)
+        .child(
+          S.documentTypeList("post")
+            .title("Blog Posts")
+            .defaultOrdering([{ field: "publishedAt", direction: "desc" }])
+        ),
+      S.listItem()
+        .title("Social Links")
+        .icon(Link)
+        .child(
+          S.documentTypeList("socialLink")
+            .title("Social Links")
+            .defaultOrdering([{ field: "order", direction: "asc" }])
         ),
     ]);

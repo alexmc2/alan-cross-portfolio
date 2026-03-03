@@ -1,35 +1,11 @@
-// app/sitemap.ts
-import { MetadataRoute } from 'next';
-import { groq } from 'next-sanity';
-import { sanityFetch } from '@/sanity/lib/live';
+import { MetadataRoute } from "next";
+import { groq } from "next-sanity";
+import { sanityFetch } from "@/sanity/lib/live";
 
-async function getPagesSitemap(): Promise<MetadataRoute.Sitemap[]> {
-  const pagesQuery = groq`
-    *[_type == 'page'] | order(slug.current) {
-      'url': $baseUrl + select(slug.current == 'index' => '', '/' + slug.current),
-      'lastModified': _updatedAt,
-      'changeFrequency': 'daily',
-      'priority': select(
-        slug.current == 'index' => 1,
-        0.5
-      )
-    }
-  `;
-
-  const { data } = await sanityFetch({
-    query: pagesQuery,
-    params: {
-      baseUrl: process.env.NEXT_PUBLIC_SITE_URL,
-    },
-  });
-
-  return data;
-}
-
-async function getPostsSitemap(): Promise<MetadataRoute.Sitemap[]> {
+async function getPostsSitemap(): Promise<MetadataRoute.Sitemap> {
   const postsQuery = groq`
     *[_type == 'post'] | order(_updatedAt desc) {
-      'url': $baseUrl + '/news/' + slug.current,
+      'url': $baseUrl + '/blog/' + slug.current,
       'lastModified': _updatedAt,
       'changeFrequency': 'weekly',
       'priority': 0.7
@@ -46,11 +22,50 @@ async function getPostsSitemap(): Promise<MetadataRoute.Sitemap[]> {
   return data;
 }
 
-export default async function sitemap(): Promise<MetadataRoute.Sitemap[]> {
-  const [pages, posts] = await Promise.all([
-    getPagesSitemap(),
-    getPostsSitemap(),
-  ]);
+async function getPagesSitemap(): Promise<MetadataRoute.Sitemap> {
+  const pagesQuery = groq`
+    *[
+      _type == 'page' &&
+      defined(slug.current) &&
+      slug.current != 'index' &&
+      slug.current != 'blog' &&
+      slug.current != 'studio'
+    ] | order(_updatedAt desc) {
+      'url': $baseUrl + '/' + slug.current,
+      'lastModified': _updatedAt,
+      'changeFrequency': 'weekly',
+      'priority': 0.6
+    }
+  `;
 
-  return [...pages, ...posts];
+  const { data } = await sanityFetch({
+    query: pagesQuery,
+    params: {
+      baseUrl: process.env.NEXT_PUBLIC_SITE_URL,
+    },
+  });
+
+  return data;
+}
+
+export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://alanxai.com";
+  const [pages, posts] = await Promise.all([getPagesSitemap(), getPostsSitemap()]);
+
+  const staticPages: MetadataRoute.Sitemap = [
+    {
+      url: baseUrl,
+      lastModified: new Date(),
+      changeFrequency: "daily",
+      priority: 1,
+    },
+    {
+      url: `${baseUrl}/blog`,
+      lastModified: new Date(),
+      changeFrequency: "weekly",
+      priority: 0.8,
+    },
+  ];
+
+  return [...staticPages, ...pages, ...posts];
 }
