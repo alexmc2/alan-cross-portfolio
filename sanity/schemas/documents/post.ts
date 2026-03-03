@@ -1,4 +1,3 @@
-// sanity/schemas/documents/post.ts
 import { defineField, defineType } from "sanity";
 import { FileText } from "lucide-react";
 
@@ -8,18 +7,9 @@ export default defineType({
   type: "document",
   icon: FileText,
   groups: [
-    {
-      name: "content",
-      title: "Content",
-    },
-    {
-      name: "seo",
-      title: "SEO",
-    },
-    {
-      name: "settings",
-      title: "Settings",
-    },
+    { name: "content", title: "Content" },
+    { name: "seo", title: "SEO" },
+    { name: "settings", title: "Settings" },
   ],
   fields: [
     defineField({
@@ -34,33 +24,31 @@ export default defineType({
       title: "Slug",
       type: "slug",
       group: "settings",
-      options: {
-        source: "title",
-        maxLength: 96,
-      },
+      options: { source: "title", maxLength: 96 },
       validation: (Rule) => Rule.required(),
+    }),
+    defineField({
+      name: "publishedAt",
+      title: "Published At",
+      type: "datetime",
+      group: "settings",
+      validation: (Rule) => Rule.required(),
+      initialValue: () => new Date().toISOString(),
     }),
     defineField({
       name: "excerpt",
       title: "Excerpt",
+      description: "Short preview text for blog listing",
       type: "text",
+      rows: 3,
       group: "content",
     }),
     defineField({
-      name: "author",
-      title: "Author",
-      type: "reference",
-      group: "settings",
-      to: { type: "author" },
-    }),
-    defineField({
-      name: "image",
-      title: "Image",
+      name: "mainImage",
+      title: "Main Image",
       type: "image",
-      group: "settings",
-      options: {
-        hotspot: true,
-      },
+      group: "content",
+      options: { hotspot: true },
       fields: [
         {
           name: "alt",
@@ -70,11 +58,19 @@ export default defineType({
       ],
     }),
     defineField({
-      name: "categories",
-      title: "Categories",
-      type: "array",
+      name: "category",
+      title: "Category",
+      type: "string",
       group: "settings",
-      of: [{ type: "reference", to: { type: "category" } }],
+      options: {
+        list: [
+          { title: "Production", value: "Production" },
+          { title: "AI", value: "AI" },
+          { title: "Course", value: "Course" },
+          { title: "Behind the Scenes", value: "Behind the Scenes" },
+          { title: "General", value: "General" },
+        ],
+      },
     }),
     defineField({
       name: "body",
@@ -103,21 +99,16 @@ export default defineType({
     }),
     defineField({
       name: "ogImage",
-      title: "Open Graph Image - [1200x630]",
+      title: "Open Graph Image (1200x630)",
       type: "image",
       group: "seo",
     }),
   ],
-
   preview: {
     select: {
       title: "title",
-      author: "author.name",
-      media: "image",
-    },
-    prepare(selection) {
-      const { author } = selection;
-      return { ...selection, subtitle: author && `by ${author}` };
+      subtitle: "category",
+      media: "mainImage",
     },
   },
 });

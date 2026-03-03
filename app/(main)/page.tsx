@@ -1,21 +1,41 @@
-// app/(main)/page.tsx
-import Blocks from "@/components/blocks";
-import { fetchSanityPageBySlug } from "@/sanity/lib/fetch";
-import { generatePageMetadata } from "@/sanity/lib/metadata";
-import MissingSanityPage from "@/components/ui/missing-sanity-page";
-
-export async function generateMetadata() {
-  const page = await fetchSanityPageBySlug({ slug: "index" });
-
-  return generatePageMetadata({ page, slug: "index" });
-}
+import {
+  fetchSiteSettings,
+  fetchPortfolioItems,
+  fetchServices,
+  fetchSocialLinks,
+} from "@/sanity/lib/fetch";
+import Nav from "@/components/nav";
+import Hero from "@/components/sections/hero";
+import Work from "@/components/sections/work";
+import About from "@/components/sections/about";
+import Services from "@/components/sections/services";
+import Contact from "@/components/sections/contact";
+import SiteFooter from "@/components/sections/site-footer";
+import HomepageClient from "@/components/homepage-client";
+import type { SiteSettings, PortfolioItem, Service, SocialLink } from "@/types";
 
 export default async function IndexPage() {
-  const page = await fetchSanityPageBySlug({ slug: "index" });
+  const [settings, portfolioItems, services, socialLinks] = await Promise.all([
+    fetchSiteSettings(),
+    fetchPortfolioItems(),
+    fetchServices(),
+    fetchSocialLinks(),
+  ]);
 
-  if (!page) {
-    return MissingSanityPage({ document: "page", slug: "index" });
-  }
+  const siteSettings = (settings || {}) as SiteSettings;
+  const items = (portfolioItems || []) as PortfolioItem[];
+  const servicesList = (services || []) as Service[];
+  const links = (socialLinks || []) as SocialLink[];
 
-  return <Blocks blocks={page?.blocks ?? []} />;
+  return (
+    <HomepageClient>
+      <Nav />
+      <Hero settings={siteSettings} />
+      <Work items={items} />
+      <About settings={siteSettings} />
+      <Services services={servicesList} />
+      <Contact settings={siteSettings} socialLinks={links} />
+      <SiteFooter />
+    </HomepageClient>
+  );
 }

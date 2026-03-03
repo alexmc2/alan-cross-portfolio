@@ -1,20 +1,17 @@
-// lib/fonts.ts
-import { Inter, Poppins } from "next/font/google";
+import { Syne, Outfit } from "next/font/google";
 
-export const fontSans = Inter({
+export const fontDisplay = Syne({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-sans",
+  weight: ["400", "600", "700", "800"],
+  variable: "--font-display",
   display: "swap",
   preload: true,
 });
 
-export const fontBody = fontSans;
-
-export const fontHeading = Poppins({
+export const fontBody = Outfit({
   subsets: ["latin"],
-  weight: ["400", "500", "600", "700"],
-  variable: "--font-display",
+  weight: ["300", "400", "500", "600"],
+  variable: "--font-body",
   display: "swap",
   preload: true,
 });

@@ -48,9 +48,9 @@ const createPortableTextComponents = (
       },
       code: ({ value }) => {
         return (
-          <div className="grid my-4 overflow-x-auto rounded-lg border border-border text-xs lg:text-sm bg-primary/80 dark:bg-muted/80">
-            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-primary/80 dark:bg-muted">
-              <div className="text-muted-foreground font-mono">
+          <div className="grid my-4 overflow-x-auto rounded-lg border border-border text-xs lg:text-sm bg-bg-card">
+            <div className="flex items-center justify-between px-4 py-2 border-b border-border bg-bg-elevated">
+              <div className="text-text-muted font-mono">
                 {value.filename || ""}
               </div>
               <CopyButton code={value.code} />
