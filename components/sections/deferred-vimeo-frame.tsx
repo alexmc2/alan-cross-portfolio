@@ -49,6 +49,10 @@ export default function DeferredVimeoFrame({
             }
             // Give brief scroll grace period so we don't thrash iframe mounts.
             unloadTimerRef.current = setTimeout(() => {
+              if (readyTimerRef.current) {
+                clearTimeout(readyTimerRef.current);
+                readyTimerRef.current = null;
+              }
               setShouldLoad(false);
               setIsFrameReady(false);
               unloadTimerRef.current = null;
