@@ -42,6 +42,10 @@ const nextConfig = {
         protocol: "https",
         hostname: "vumbnail.com",
       },
+      {
+        protocol: "https",
+        hostname: "i.ytimg.com",
+      },
     ],
     formats: ["image/avif", "image/webp"],
   },

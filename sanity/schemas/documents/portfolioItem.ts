@@ -37,9 +37,25 @@ export default defineType({
     }),
     defineField({
       name: "vimeoUrl",
-      title: "Vimeo URL",
-      description: "Link to the Vimeo video",
+      title: "Vimeo URL (Legacy)",
+      description: "Existing Vimeo-only field kept for backward compatibility",
       type: "url",
+    }),
+    defineField({
+      name: "videoUrl",
+      title: "Video URL",
+      description:
+        "Paste a video URL (Vimeo, YouTube, or another supported platform)",
+      type: "url",
+    }),
+    defineField({
+      name: "videoFile",
+      title: "Video File Upload",
+      description: "Optional uploaded video file (MP4/WebM)",
+      type: "file",
+      options: {
+        accept: "video/mp4,video/webm",
+      },
     }),
     defineField({
       name: "thumbnail",

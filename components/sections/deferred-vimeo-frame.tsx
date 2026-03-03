@@ -8,7 +8,9 @@ const UNLOAD_DELAY_MS = 90000;
 const FRAME_ROOT_MARGIN = "1200px 0px";
 
 type DeferredVimeoFrameProps = {
+  mediaType?: "iframe" | "video";
   src: string;
+  mimeType?: string;
   title: string;
   sizes: string;
   fallbackLabel: string;
@@ -17,7 +19,9 @@ type DeferredVimeoFrameProps = {
 };
 
 export default function DeferredVimeoFrame({
+  mediaType = "iframe",
   src,
+  mimeType,
   title,
   sizes,
   fallbackLabel,
@@ -128,15 +132,29 @@ export default function DeferredVimeoFrame({
       ) : null}
 
       {shouldLoad ? (
-        <iframe
-          src={src}
-          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none"
-          allow="autoplay; fullscreen; encrypted-media"
-          allowFullScreen
-          loading="lazy"
-          title={title}
-          onLoad={handleFrameLoad}
-        />
+        mediaType === "video" ? (
+          <video
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="metadata"
+            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            onLoadedData={handleFrameLoad}
+          >
+            <source src={src} type={mimeType || "video/mp4"} />
+          </video>
+        ) : (
+          <iframe
+            src={src}
+            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none"
+            allow="autoplay; fullscreen; encrypted-media"
+            allowFullScreen
+            loading="lazy"
+            title={title}
+            onLoad={handleFrameLoad}
+          />
+        )
       ) : null}
 
       {showFallback ? (

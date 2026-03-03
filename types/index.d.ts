@@ -44,6 +44,14 @@ export type PortfolioItem = {
   slug: { current: string };
   category?: string;
   vimeoUrl?: string;
+  videoUrl?: string;
+  videoFile?: {
+    asset?: {
+      _id: string;
+      url: string;
+      mimeType?: string;
+    };
+  };
   thumbnail?: SanityImage;
   description?: string;
   year?: string;

@@ -46,6 +46,24 @@ type VimeoEmbedOptions = {
   dnt?: boolean;
 };
 
+const hasDomain = (hostname: string, domain: string): boolean => {
+  return hostname === domain || hostname.endsWith(`.${domain}`);
+};
+
+const isVimeoHostname = (hostname: string): boolean => {
+  const lower = hostname.toLowerCase();
+  return hasDomain(lower, 'vimeo.com');
+};
+
+const isYouTubeHostname = (hostname: string): boolean => {
+  const lower = hostname.toLowerCase();
+  return (
+    lower === 'youtu.be' ||
+    hasDomain(lower, 'youtube.com') ||
+    hasDomain(lower, 'youtube-nocookie.com')
+  );
+};
+
 /**
  * Normalise a Vimeo player URL for reliable background-style embedding.
  *
@@ -60,7 +78,7 @@ export function normaliseVimeoUrl(
 ): string {
   try {
     const url = new URL(raw);
-    if (!url.hostname.includes('vimeo.com')) return raw;
+    if (!isVimeoHostname(url.hostname)) return raw;
 
     const {
       autoplay = true,
@@ -115,7 +133,7 @@ export function vimeoEmbedUrl(
     }
 
     // Standard vimeo.com/12345 watch page
-    if (url.hostname.includes('vimeo.com')) {
+    if (isVimeoHostname(url.hostname)) {
       const match = url.pathname.match(/\/(\d+)/);
       if (match) {
         const embedBase = `https://player.vimeo.com/video/${match[1]}`;
@@ -138,7 +156,7 @@ export function vimeoEmbedUrl(
 export function vimeoVideoId(raw: string): string | null {
   try {
     const url = new URL(raw);
-    if (!url.hostname.includes('vimeo.com')) return null;
+    if (!isVimeoHostname(url.hostname)) return null;
 
     const playerMatch = url.pathname.match(/\/video\/(\d+)/);
     if (playerMatch) return playerMatch[1];
@@ -158,4 +176,67 @@ export function vimeoVideoId(raw: string): string | null {
 export function vimeoPosterUrl(raw: string): string | null {
   const id = vimeoVideoId(raw);
   return id ? `https://vumbnail.com/${id}.jpg` : null;
+}
+
+/**
+ * Extract a YouTube video id from common watch/share/embed URLs.
+ */
+export function youtubeVideoId(raw: string): string | null {
+  try {
+    const url = new URL(raw);
+    if (!isYouTubeHostname(url.hostname)) return null;
+
+    if (url.hostname.toLowerCase() === 'youtu.be') {
+      const shortId = url.pathname.split('/').filter(Boolean)[0];
+      return shortId || null;
+    }
+
+    if (url.pathname.startsWith('/watch')) {
+      return url.searchParams.get('v');
+    }
+
+    const embedMatch = url.pathname.match(/^\/embed\/([^/?#]+)/);
+    if (embedMatch) return embedMatch[1];
+
+    const shortsMatch = url.pathname.match(/^\/shorts\/([^/?#]+)/);
+    if (shortsMatch) return shortsMatch[1];
+
+    const liveMatch = url.pathname.match(/^\/live\/([^/?#]+)/);
+    if (liveMatch) return liveMatch[1];
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Convert YouTube URL into a muted autoplay embed.
+ */
+export function youtubeEmbedUrl(raw: string): string | null {
+  const id = youtubeVideoId(raw);
+  if (!id) return null;
+
+  try {
+    const url = new URL(`https://www.youtube-nocookie.com/embed/${id}`);
+    url.searchParams.set('autoplay', '1');
+    url.searchParams.set('mute', '1');
+    url.searchParams.set('loop', '1');
+    url.searchParams.set('playlist', id);
+    url.searchParams.set('controls', '0');
+    url.searchParams.set('rel', '0');
+    url.searchParams.set('playsinline', '1');
+    url.searchParams.set('modestbranding', '1');
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Lightweight poster for YouTube videos.
+ */
+export function youtubePosterUrl(raw: string): string | null {
+  const id = youtubeVideoId(raw);
+  return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
 }
