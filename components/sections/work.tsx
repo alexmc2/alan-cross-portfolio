@@ -1,7 +1,8 @@
 import type { PortfolioItem } from '@/types';
 import { urlFor } from '@/sanity/lib/image';
-import { vimeoEmbedUrl } from '@/lib/utils';
+import { vimeoEmbedUrl, vimeoPosterUrl } from '@/lib/utils';
 import Image from 'next/image';
+import DeferredVimeoFrame from './deferred-vimeo-frame';
 
 export default function Work({ items }: { items: PortfolioItem[] }) {
   return (
@@ -13,6 +14,14 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
             const embedSrc = item.vimeoUrl
               ? vimeoEmbedUrl(item.vimeoUrl)
               : null;
+            const thumbnailUrl = item.thumbnail?.asset
+              ? urlFor(item.thumbnail)
+                  .width(1200)
+                  .height(item.featured ? 514 : 675)
+                  .url()
+              : null;
+            const posterSrc = thumbnailUrl ?? (item.vimeoUrl ? vimeoPosterUrl(item.vimeoUrl) : null);
+            const imageSizes = item.featured ? '1200px' : '600px';
 
             return (
               <div
@@ -27,30 +36,27 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                 {/* Video / Thumbnail / Placeholder */}
                 <div className="w-full h-full">
                   {embedSrc ? (
-                    <div className="absolute inset-0 overflow-hidden">
-                      <iframe
-                        src={embedSrc}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none"
-                        allow="autoplay; fullscreen; encrypted-media"
-                        allowFullScreen
-                        loading="lazy"
-                        title={item.title}
-                      />
-                    </div>
-                  ) : item.thumbnail?.asset ? (
+                    <DeferredVimeoFrame
+                      src={embedSrc}
+                      title={item.title}
+                      fallbackLabel={item.category || 'Video'}
+                      sizes={imageSizes}
+                      posterSrc={posterSrc ?? undefined}
+                      posterBlurDataURL={item.thumbnail?.asset?.metadata?.lqip}
+                    />
+                  ) : thumbnailUrl ? (
                     <Image
-                      src={urlFor(item.thumbnail)
-                        .width(1200)
-                        .height(item.featured ? 514 : 675)
-                        .url()}
+                      src={thumbnailUrl}
                       alt={item.title}
                       fill
                       className="object-cover"
-                      sizes={item.featured ? '1200px' : '600px'}
+                      sizes={imageSizes}
                       placeholder={
-                        item.thumbnail.asset.metadata?.lqip ? 'blur' : undefined
+                        item.thumbnail?.asset?.metadata?.lqip
+                          ? 'blur'
+                          : undefined
                       }
-                      blurDataURL={item.thumbnail.asset.metadata?.lqip}
+                      blurDataURL={item.thumbnail?.asset?.metadata?.lqip}
                     />
                   ) : (
                     <div

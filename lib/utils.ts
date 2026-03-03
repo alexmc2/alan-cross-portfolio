@@ -38,6 +38,14 @@ export const extractPlainText = (blocks: BlockContent): string | null => {
     .join(' ');
 };
 
+type VimeoEmbedOptions = {
+  autoplay?: boolean;
+  loop?: boolean;
+  muted?: boolean;
+  hideUi?: boolean;
+  dnt?: boolean;
+};
+
 /**
  * Normalise a Vimeo player URL for reliable background-style embedding.
  *
@@ -46,25 +54,39 @@ export const extractPlainText = (blocks: BlockContent): string | null => {
  * We strip it and instead set the free-tier params that hide as much
  * chrome as possible while still allowing autoplay.
  */
-export function normaliseVimeoUrl(raw: string): string {
+export function normaliseVimeoUrl(
+  raw: string,
+  options: VimeoEmbedOptions = {}
+): string {
   try {
     const url = new URL(raw);
     if (!url.hostname.includes('vimeo.com')) return raw;
+
+    const {
+      autoplay = true,
+      loop = true,
+      muted = true,
+      hideUi = true,
+      dnt = true,
+    } = options;
 
     // Remove the premium-only background flag
     url.searchParams.delete('background');
 
     // Ensure autoplay / loop / muted (works on every plan)
-    url.searchParams.set('autoplay', '1');
-    url.searchParams.set('loop', '1');
-    url.searchParams.set('muted', '1');
+    url.searchParams.set('autoplay', autoplay ? '1' : '0');
+    url.searchParams.set('loop', loop ? '1' : '0');
+    url.searchParams.set('muted', muted ? '1' : '0');
 
-    // Hide UI elements (free-tier friendly)
-    url.searchParams.set('title', '0');
-    url.searchParams.set('byline', '0');
-    url.searchParams.set('portrait', '0');
-    url.searchParams.set('controls', '0');
-    url.searchParams.set('dnt', '1');
+    if (hideUi) {
+      // Hide UI elements (free-tier friendly)
+      url.searchParams.set('title', '0');
+      url.searchParams.set('byline', '0');
+      url.searchParams.set('portrait', '0');
+      url.searchParams.set('controls', '0');
+    }
+
+    url.searchParams.set('dnt', dnt ? '1' : '0');
 
     return url.toString();
   } catch {
@@ -80,13 +102,16 @@ export function normaliseVimeoUrl(raw: string): string {
  *   https://vimeo.com/7851544
  *   https://player.vimeo.com/video/7851544?h=abc123&...
  */
-export function vimeoEmbedUrl(raw: string): string | null {
+export function vimeoEmbedUrl(
+  raw: string,
+  options: VimeoEmbedOptions = {}
+): string | null {
   try {
     const url = new URL(raw);
 
     // Already a player URL — just normalise params
     if (url.hostname === 'player.vimeo.com') {
-      return normaliseVimeoUrl(raw);
+      return normaliseVimeoUrl(raw, options);
     }
 
     // Standard vimeo.com/12345 watch page
@@ -97,7 +122,7 @@ export function vimeoEmbedUrl(raw: string): string | null {
         // Carry over the hash param (h=...) if present in the original
         const hParam = url.searchParams.get('h');
         const withH = hParam ? `${embedBase}?h=${hParam}` : embedBase;
-        return normaliseVimeoUrl(withH);
+        return normaliseVimeoUrl(withH, options);
       }
     }
 
@@ -105,4 +130,32 @@ export function vimeoEmbedUrl(raw: string): string | null {
   } catch {
     return null;
   }
+}
+
+/**
+ * Extract a Vimeo video id from watch or player URLs.
+ */
+export function vimeoVideoId(raw: string): string | null {
+  try {
+    const url = new URL(raw);
+    if (!url.hostname.includes('vimeo.com')) return null;
+
+    const playerMatch = url.pathname.match(/\/video\/(\d+)/);
+    if (playerMatch) return playerMatch[1];
+
+    const watchMatch = url.pathname.match(/\/(\d+)/);
+    if (watchMatch) return watchMatch[1];
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
+/**
+ * Lightweight poster via vumbnail service for Vimeo videos.
+ */
+export function vimeoPosterUrl(raw: string): string | null {
+  const id = vimeoVideoId(raw);
+  return id ? `https://vumbnail.com/${id}.jpg` : null;
 }
