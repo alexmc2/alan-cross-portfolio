@@ -1,10 +1,10 @@
 import type { SiteSettings } from '@/types';
-import { normaliseVimeoUrl } from '@/lib/utils';
+import { vimeoEmbedUrl } from '@/lib/utils';
 
 export default function Hero({ settings }: { settings: SiteSettings }) {
   const videoUrl = settings.heroVideo?.asset?.url;
   const externalVideoUrl = settings.heroVideoUrl
-    ? normaliseVimeoUrl(settings.heroVideoUrl)
+    ? vimeoEmbedUrl(settings.heroVideoUrl)
     : undefined;
   const height = settings.heroHeight || '75vh';
   const edgeStyle = settings.heroEdgeStyle || 'gradient';

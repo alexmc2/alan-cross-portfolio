@@ -44,9 +44,14 @@ export default defineType({
     defineField({
       name: 'linkUrl',
       title: 'Link URL',
-      type: 'string',
+      type: 'url',
       description:
         'Optional link. For social/website use the full URL. For phone/email this is auto-generated from the value if left blank (tel: / mailto:).',
+      validation: (Rule) =>
+        Rule.uri({
+          allowRelative: false,
+          scheme: ['http', 'https', 'mailto', 'tel'],
+        }),
     }),
     defineField({
       name: 'order',
