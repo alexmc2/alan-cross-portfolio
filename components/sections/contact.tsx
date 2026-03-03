@@ -1,44 +1,35 @@
-import type { SiteSettings, SocialLink } from "@/types";
+import type { SiteSettings, ContactDetail } from '@/types';
+
+/**
+ * Resolves the href for a contact detail row.
+ * - Social / website: uses linkUrl directly
+ * - Phone: auto-generates tel: if no explicit linkUrl
+ * - Email: auto-generates mailto: if no explicit linkUrl
+ * - Location / address / other: uses linkUrl if provided, otherwise no link
+ */
+function resolveHref(detail: ContactDetail): string | undefined {
+  if (detail.linkUrl) return detail.linkUrl;
+  switch (detail.detailType) {
+    case 'phone':
+      return `tel:${detail.value.replace(/\s+/g, '')}`;
+    case 'email':
+      return `mailto:${detail.value}`;
+    case 'social':
+    case 'website':
+      // If someone forgot to add a linkUrl for a social/website, try the value
+      return detail.value.startsWith('http') ? detail.value : undefined;
+    default:
+      return undefined;
+  }
+}
 
 export default function Contact({
   settings,
-  socialLinks,
+  contactDetails,
 }: {
   settings: SiteSettings;
-  socialLinks: SocialLink[];
+  contactDetails: ContactDetail[];
 }) {
-  // Extract display names from URLs for the detail rows
-  const linkedIn = socialLinks.find((s) => s.platform === "LinkedIn");
-  const vimeo = socialLinks.find((s) => s.platform === "Vimeo");
-  const youtube = socialLinks.find((s) => s.platform === "YouTube");
-
-  const detailRows = [
-    { label: "Location", value: "South Coast, UK" },
-    linkedIn && {
-      label: "LinkedIn",
-      value: linkedIn.url.replace(/^https?:\/\//, "").replace(/\/$/, ""),
-      href: linkedIn.url,
-    },
-    vimeo && {
-      label: "Vimeo",
-      value: vimeo.url.replace(/^https?:\/\//, "").replace(/\/$/, ""),
-      href: vimeo.url,
-    },
-    youtube && {
-      label: "YouTube",
-      value: youtube.url
-        .replace(/^https?:\/\//, "")
-        .replace(/\/$/, "")
-        .replace("www.", "")
-        .replace("/user/", "/"),
-      href: youtube.url,
-    },
-  ].filter(Boolean) as Array<{
-    label: string;
-    value: string;
-    href?: string;
-  }>;
-
   return (
     <section
       id="contact"
@@ -82,47 +73,45 @@ export default function Contact({
 
         {/* Right column */}
         <div className="pt-4 reveal">
-          {detailRows.map((row, i) => (
-            <div
-              key={row.label}
-              className={`py-6 border-b border-border flex justify-between items-center ${
-                i === 0 ? "border-t" : ""
-              }`}
-            >
-              <span className="text-[0.7rem] tracking-[0.2em] uppercase text-text-muted">
-                {row.label}
-              </span>
-              <span className="text-[0.95rem] text-text-primary">
-                {row.href ? (
-                  <a
-                    href={row.href}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="text-text-primary no-underline transition-colors duration-300 hover:text-accent"
-                  >
-                    {row.value}
-                  </a>
-                ) : (
-                  row.value
-                )}
-              </span>
-            </div>
-          ))}
-
-          {/* Social links row */}
-          <div className="flex gap-6 mt-10">
-            {socialLinks.map((link) => (
-              <a
-                key={link._id}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[0.72rem] tracking-[0.15em] uppercase text-text-muted no-underline transition-colors duration-300 hover:text-accent"
+          {contactDetails.map((detail, i) => {
+            const href = resolveHref(detail);
+            return (
+              <div
+                key={detail._id}
+                className={`py-6 border-b border-border flex justify-between items-center ${
+                  i === 0 ? 'border-t' : ''
+                }`}
               >
-                {link.platform}
-              </a>
-            ))}
-          </div>
+                <span className="text-[0.7rem] tracking-[0.2em] uppercase text-accent">
+                  {detail.label}
+                </span>
+                <span className="text-[0.95rem] text-text-primary">
+                  {href ? (
+                    <a
+                      href={href}
+                      target={
+                        detail.detailType === 'phone' ||
+                        detail.detailType === 'email'
+                          ? undefined
+                          : '_blank'
+                      }
+                      rel={
+                        detail.detailType === 'phone' ||
+                        detail.detailType === 'email'
+                          ? undefined
+                          : 'noopener noreferrer'
+                      }
+                      className="text-text-primary no-underline transition-colors duration-300 hover:text-accent"
+                    >
+                      {detail.value}
+                    </a>
+                  ) : (
+                    detail.value
+                  )}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
     </section>

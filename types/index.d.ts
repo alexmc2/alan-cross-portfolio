@@ -1,6 +1,6 @@
 export type SiteSettings = {
   _id: string;
-  _type: "siteSettings";
+  _type: 'siteSettings';
   siteTitle?: string;
   siteDescription?: string;
   heroTagline?: string;
@@ -13,6 +13,8 @@ export type SiteSettings = {
     };
   };
   heroVideoUrl?: string;
+  heroHeight?: '100vh' | '75vh' | '66vh' | '50vh';
+  heroEdgeStyle?: 'gradient' | 'blur' | 'solid';
   aboutHeading?: string;
   aboutBody?: any[];
   aboutImage?: SanityImage;
@@ -37,7 +39,7 @@ export type SiteSettings = {
 
 export type PortfolioItem = {
   _id: string;
-  _type: "portfolioItem";
+  _type: 'portfolioItem';
   title: string;
   slug: { current: string };
   category?: string;
@@ -51,7 +53,7 @@ export type PortfolioItem = {
 
 export type Service = {
   _id: string;
-  _type: "service";
+  _type: 'service';
   title: string;
   description: string;
   icon?: string;
@@ -60,7 +62,7 @@ export type Service = {
 
 export type Post = {
   _id: string;
-  _type: "post";
+  _type: 'post';
   title: string;
   slug: { current: string };
   publishedAt: string;
@@ -84,7 +86,7 @@ export type Post = {
 
 export type Page = {
   _id: string;
-  _type: "page";
+  _type: 'page';
   title: string;
   slug: { current: string };
   body?: any[];
@@ -104,14 +106,31 @@ export type Page = {
 
 export type SocialLink = {
   _id: string;
-  _type: "socialLink";
+  _type: 'socialLink';
   platform: string;
   url: string;
   order?: number;
 };
 
+export type ContactDetail = {
+  _id: string;
+  _type: 'contactDetail';
+  detailType:
+    | 'social'
+    | 'phone'
+    | 'email'
+    | 'location'
+    | 'address'
+    | 'website'
+    | 'other';
+  label: string;
+  value: string;
+  linkUrl?: string;
+  order?: number;
+};
+
 export type SanityImage = {
-  _type?: "image";
+  _type?: 'image';
   asset?: {
     _id: string;
     _createdAt?: string;

@@ -7,15 +7,14 @@
   --color-bg-primary: #0a0a0a;
   --color-bg-elevated: #111111;
   --color-bg-card: #161616;
-  --color-text-primary: #f0ece6;
-  --color-text-secondary: #8a8580;
-  --color-text-muted: #5a5550;
+  --color-text-primary: #f5f2ee; /* was #f0ece6 — slightly brighter */
+  --color-text-secondary: #b8b2aa; /* was #8a8580 — much more readable */
+  --color-text-muted: #807870; /* was #5a5550 — lifted out of near-invisible */
   --color-accent: #c8a46e;
   --color-border: rgba(255, 255, 255, 0.06);
 
   --animate-fade-up: fade-up 1.2s ease forwards;
   --animate-fade-in: fade-in 1.5s ease forwards;
-  --animate-scroll-pulse: scroll-pulse 2s ease infinite;
 }
 
 @keyframes fade-up {
@@ -35,16 +34,6 @@
   }
   to {
     opacity: 1;
-  }
-}
-
-@keyframes scroll-pulse {
-  0%,
-  100% {
-    opacity: 0.3;
-  }
-  50% {
-    opacity: 0.8;
   }
 }
 

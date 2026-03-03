@@ -1,18 +1,16 @@
 // sanity/lib/fetch.ts
-import { sanityFetch } from "@/sanity/lib/live";
-import { SITE_SETTINGS_QUERY } from "@/sanity/queries/siteSettings";
-import { PORTFOLIO_ITEMS_QUERY } from "@/sanity/queries/portfolioItem";
-import { SERVICES_QUERY } from "@/sanity/queries/service";
-import { SOCIAL_LINKS_QUERY } from "@/sanity/queries/socialLink";
-import {
-  PAGE_QUERY,
-  PAGES_SLUGS_QUERY,
-} from "@/sanity/queries/page";
+import { sanityFetch } from '@/sanity/lib/live';
+import { SITE_SETTINGS_QUERY } from '@/sanity/queries/siteSettings';
+import { PORTFOLIO_ITEMS_QUERY } from '@/sanity/queries/portfolioItem';
+import { SERVICES_QUERY } from '@/sanity/queries/service';
+import { SOCIAL_LINKS_QUERY } from '@/sanity/queries/socialLink';
+import { CONTACT_DETAILS_QUERY } from '@/sanity/queries/contactDetail';
+import { PAGE_QUERY, PAGES_SLUGS_QUERY } from '@/sanity/queries/page';
 import {
   POST_QUERY,
   POSTS_QUERY,
   POSTS_SLUGS_QUERY,
-} from "@/sanity/queries/post";
+} from '@/sanity/queries/post';
 
 export const fetchSiteSettings = async () => {
   const { data } = await sanityFetch({
@@ -42,6 +40,13 @@ export const fetchSocialLinks = async () => {
   return data;
 };
 
+export const fetchContactDetails = async () => {
+  const { data } = await sanityFetch({
+    query: CONTACT_DETAILS_QUERY,
+  });
+  return data;
+};
+
 export const fetchSanityPosts = async () => {
   const { data } = await sanityFetch({
     query: POSTS_QUERY,
@@ -49,11 +54,7 @@ export const fetchSanityPosts = async () => {
   return data;
 };
 
-export const fetchSanityPostBySlug = async ({
-  slug,
-}: {
-  slug: string;
-}) => {
+export const fetchSanityPostBySlug = async ({ slug }: { slug: string }) => {
   const { data } = await sanityFetch({
     query: POST_QUERY,
     params: { slug },
@@ -64,17 +65,13 @@ export const fetchSanityPostBySlug = async ({
 export const fetchSanityPostsStaticParams = async () => {
   const { data } = await sanityFetch({
     query: POSTS_SLUGS_QUERY,
-    perspective: "published",
+    perspective: 'published',
     stega: false,
   });
   return data;
 };
 
-export const fetchSanityPageBySlug = async ({
-  slug,
-}: {
-  slug: string;
-}) => {
+export const fetchSanityPageBySlug = async ({ slug }: { slug: string }) => {
   const { data } = await sanityFetch({
     query: PAGE_QUERY,
     params: { slug },
@@ -85,7 +82,7 @@ export const fetchSanityPageBySlug = async ({
 export const fetchSanityPagesStaticParams = async () => {
   const { data } = await sanityFetch({
     query: PAGES_SLUGS_QUERY,
-    perspective: "published",
+    perspective: 'published',
     stega: false,
   });
   return data;
