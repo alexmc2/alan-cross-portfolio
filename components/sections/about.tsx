@@ -1,11 +1,14 @@
-import type { SiteSettings } from "@/types";
-import { urlFor } from "@/sanity/lib/image";
-import Image from "next/image";
-import { PortableText } from "@portabletext/react";
+import type { SiteSettings } from '@/types';
+import { urlFor } from '@/sanity/lib/image';
+import Image from 'next/image';
+import { PortableText } from '@portabletext/react';
 
 export default function About({ settings }: { settings: SiteSettings }) {
   return (
-    <section id="about" className="py-28 px-12 max-md:py-20 max-md:px-6">
+    <section
+      id="about"
+      className="pt-36 pb-28 px-12 max-md:pt-28 max-md:pb-20 max-md:px-6"
+    >
       <div className="max-w-[1200px] mx-auto grid grid-cols-2 gap-20 items-start max-[900px]:grid-cols-1 max-[900px]:gap-12">
         {/* Text column */}
         <div className="reveal">
@@ -16,7 +19,7 @@ export default function About({ settings }: { settings: SiteSettings }) {
             </h2>
           )}
           {settings.aboutBody && (
-            <div className="text-text-secondary text-base [&>p]:mb-5 [&>p]:max-w-[480px] [&>p]:leading-[1.7]">
+            <div className="text-text-secondary text-base [&>p]:mb-5 [&>p]:max-w-[480px] max-[900px]:[&>p]:max-w-full [&>p]:leading-[1.7]">
               <PortableText value={settings.aboutBody} />
             </div>
           )}
@@ -37,7 +40,7 @@ export default function About({ settings }: { settings: SiteSettings }) {
         </div>
 
         {/* Image column */}
-        <div className="relative aspect-[4/5] bg-bg-card overflow-hidden reveal max-[900px]:max-h-[400px]">
+        <div className="relative aspect-[4/5] bg-bg-card overflow-hidden reveal max-[900px]:max-h-[400px] max-[900px]:w-full max-[900px]:mx-auto">
           {settings.aboutImage?.asset ? (
             <Image
               src={urlFor(settings.aboutImage).width(600).height(750).url()}
@@ -45,14 +48,17 @@ export default function About({ settings }: { settings: SiteSettings }) {
               fill
               className="object-cover"
               sizes="600px"
-              placeholder={settings.aboutImage.asset.metadata?.lqip ? "blur" : undefined}
+              placeholder={
+                settings.aboutImage.asset.metadata?.lqip ? 'blur' : undefined
+              }
               blurDataURL={settings.aboutImage.asset.metadata?.lqip}
             />
           ) : (
             <div
               className="w-full h-full flex items-center justify-center text-[0.7rem] tracking-[0.2em] uppercase text-text-muted"
               style={{
-                background: "linear-gradient(135deg, var(--color-bg-card), #1a1816)",
+                background:
+                  'linear-gradient(135deg, var(--color-bg-card), #1a1816)',
               }}
             >
               Photo
