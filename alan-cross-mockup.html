@@ -1,0 +1,913 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Alan Cross | AI Film and Video Production</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600&family=Syne:wght@400;600;700;800&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #0a0a0a;
+        --bg2: #111;
+        --bg3: #161616;
+        --t1: #f0ece6;
+        --t2: #8a8580;
+        --t3: #5a5550;
+        --ac: #c8a46e;
+        --bd: rgba(255, 255, 255, 0.06);
+        --fd: 'Syne', sans-serif;
+        --fb: 'Outfit', sans-serif;
+      }
+      *,
+      *::before,
+      *::after {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+      html {
+        scroll-behavior: smooth;
+      }
+      body {
+        background: var(--bg);
+        color: var(--t1);
+        font-family: var(--fb);
+        font-weight: 300;
+        line-height: 1.7;
+        overflow-x: hidden;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        padding: 1.5rem 3rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition:
+          background 0.4s,
+          padding 0.4s;
+      }
+      nav.scrolled {
+        background: rgba(10, 10, 10, 0.92);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        padding: 1rem 3rem;
+        border-bottom: 1px solid var(--bd);
+      }
+      .nav-logo {
+        font-family: var(--fd);
+        font-weight: 700;
+        font-size: 1.25rem;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--t1);
+        text-decoration: none;
+      }
+      .nav-logo b {
+        color: var(--ac);
+        font-weight: 800;
+      }
+      .nav-links {
+        display: flex;
+        gap: 2.5rem;
+        list-style: none;
+      }
+      .nav-links a {
+        font-size: 0.8rem;
+        font-weight: 400;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        color: var(--t2);
+        text-decoration: none;
+        transition: color 0.3s;
+        position: relative;
+      }
+      .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0;
+        height: 1px;
+        background: var(--ac);
+        transition: width 0.3s;
+      }
+      .nav-links a:hover {
+        color: var(--t1);
+      }
+      .nav-links a:hover::after {
+        width: 100%;
+      }
+
+      .hero {
+        position: relative;
+        width: 100%;
+        height: 100vh;
+        min-height: 600px;
+        overflow: hidden;
+        display: flex;
+        align-items: flex-end;
+      }
+      .hero-vid {
+        position: absolute;
+        inset: 0;
+        z-index: 0;
+      }
+      .hero-placeholder {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          170deg,
+          #1a1520,
+          #0d1117 40%,
+          #0a0f14 70%,
+          #0a0a0a
+        );
+        position: relative;
+      }
+      .hero-placeholder::after {
+        content: '\25B6  SHOWREEL PLAYS HERE';
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        font-family: var(--fb);
+        font-size: 0.75rem;
+        letter-spacing: 0.3em;
+        color: var(--t3);
+        text-transform: uppercase;
+        border: 1px solid var(--t3);
+        padding: 1rem 2rem;
+        opacity: 0.5;
+      }
+      .hero-overlay {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to bottom,
+          rgba(10, 10, 10, 0.2),
+          rgba(10, 10, 10, 0) 30%,
+          rgba(10, 10, 10, 0) 50%,
+          rgba(10, 10, 10, 0.7) 80%,
+          rgba(10, 10, 10, 1)
+        );
+        z-index: 1;
+      }
+      .hero-content {
+        position: relative;
+        z-index: 2;
+        padding: 0 3rem 5rem;
+        max-width: 800px;
+        animation: fadeUp 1.2s ease forwards;
+      }
+      .hero-tag {
+        font-size: 0.7rem;
+        font-weight: 500;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--ac);
+        margin-bottom: 1.25rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .hero-tag::before {
+        content: '';
+        display: block;
+        width: 2rem;
+        height: 1px;
+        background: var(--ac);
+      }
+      .hero-title {
+        font-family: var(--fd);
+        font-size: clamp(2.5rem, 5vw, 4.5rem);
+        font-weight: 700;
+        line-height: 1.1;
+        letter-spacing: -0.02em;
+        margin-bottom: 1.25rem;
+      }
+      .hero-sub {
+        font-size: 1.1rem;
+        font-weight: 300;
+        color: var(--t2);
+        max-width: 520px;
+        line-height: 1.8;
+      }
+      .hero-scroll {
+        position: absolute;
+        bottom: 2rem;
+        right: 3rem;
+        z-index: 2;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+        animation: fadeIn 1.5s ease 0.8s forwards;
+        opacity: 0;
+      }
+      .hero-scroll span {
+        font-size: 0.6rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--t3);
+        writing-mode: vertical-rl;
+      }
+      .scroll-line {
+        width: 1px;
+        height: 40px;
+        background: linear-gradient(to bottom, var(--t3), transparent);
+        animation: scrollPulse 2s ease infinite;
+      }
+
+      section {
+        padding: 7rem 3rem;
+      }
+      .slabel {
+        font-size: 0.65rem;
+        font-weight: 500;
+        letter-spacing: 0.3em;
+        text-transform: uppercase;
+        color: var(--ac);
+        margin-bottom: 2rem;
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+      }
+      .slabel::before {
+        content: '';
+        display: block;
+        width: 1.5rem;
+        height: 1px;
+        background: var(--ac);
+      }
+
+      .about {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5rem;
+        align-items: start;
+      }
+      .about-text h2 {
+        font-family: var(--fd);
+        font-size: clamp(1.8rem, 3vw, 2.8rem);
+        font-weight: 600;
+        line-height: 1.2;
+        margin-bottom: 2rem;
+      }
+      .about-text p {
+        color: var(--t2);
+        font-size: 1rem;
+        margin-bottom: 1.25rem;
+        max-width: 480px;
+      }
+      .about-img {
+        position: relative;
+        aspect-ratio: 4/5;
+        background: var(--bg3);
+        overflow: hidden;
+      }
+      .about-img-ph {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, var(--bg3), #1a1816);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--t3);
+      }
+      .about-img::after {
+        content: '';
+        position: absolute;
+        top: -1rem;
+        right: -1rem;
+        width: 5rem;
+        height: 5rem;
+        border-top: 1px solid var(--ac);
+        border-right: 1px solid var(--ac);
+        opacity: 0.3;
+      }
+      .stats {
+        display: flex;
+        gap: 3rem;
+        margin-top: 2.5rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--bd);
+      }
+      .stat {
+        display: flex;
+        flex-direction: column;
+      }
+      .stat-num {
+        font-family: var(--fd);
+        font-size: 2rem;
+        font-weight: 700;
+        color: var(--ac);
+        line-height: 1;
+      }
+      .stat-lbl {
+        font-size: 0.7rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--t3);
+        margin-top: 0.5rem;
+      }
+
+      .svc-section {
+        background: var(--bg2);
+        border-top: 1px solid var(--bd);
+        border-bottom: 1px solid var(--bd);
+      }
+      .svc-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .svc-grid {
+        display: grid;
+        grid-template-columns: repeat(3, 1fr);
+        gap: 1px;
+        background: var(--bd);
+        margin-top: 3rem;
+      }
+      .svc-card {
+        background: var(--bg2);
+        padding: 2.5rem;
+        transition: background 0.4s;
+        cursor: default;
+      }
+      .svc-card:hover {
+        background: var(--bg3);
+      }
+      .svc-icon {
+        font-size: 1.5rem;
+        margin-bottom: 1.25rem;
+        display: block;
+        opacity: 0.8;
+      }
+      .svc-card h3 {
+        font-family: var(--fd);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+      }
+      .svc-card p {
+        font-size: 0.88rem;
+        color: var(--t2);
+        line-height: 1.7;
+      }
+
+      .work-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .work-grid {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        margin-top: 3rem;
+      }
+      .work-item {
+        position: relative;
+        aspect-ratio: 16/9;
+        background: var(--bg3);
+        overflow: hidden;
+        cursor: pointer;
+      }
+      .work-thumb {
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(135deg, #151318, #1a1816 50%, #12110f);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: transform 0.6s;
+      }
+      .work-item:hover .work-thumb {
+        transform: scale(1.03);
+      }
+      .work-thumb span {
+        font-size: 0.65rem;
+        letter-spacing: 0.25em;
+        text-transform: uppercase;
+        color: var(--t3);
+        border: 1px solid rgba(255, 255, 255, 0.05);
+        padding: 0.6rem 1.2rem;
+      }
+      .work-over {
+        position: absolute;
+        inset: 0;
+        background: linear-gradient(
+          to top,
+          rgba(10, 10, 10, 0.9),
+          transparent 60%
+        );
+        display: flex;
+        flex-direction: column;
+        justify-content: flex-end;
+        padding: 2rem;
+        opacity: 0;
+        transition: opacity 0.4s;
+      }
+      .work-item:hover .work-over {
+        opacity: 1;
+      }
+      .work-over h3 {
+        font-family: var(--fd);
+        font-size: 1.15rem;
+        font-weight: 600;
+        margin-bottom: 0.3rem;
+      }
+      .work-over p {
+        font-size: 0.78rem;
+        color: var(--t2);
+        letter-spacing: 0.05em;
+      }
+      .work-item.feat {
+        grid-column: span 2;
+        aspect-ratio: 21/9;
+      }
+
+      .contact-section {
+        background: var(--bg2);
+        border-top: 1px solid var(--bd);
+      }
+      .contact-inner {
+        max-width: 1200px;
+        margin: 0 auto;
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 5rem;
+        align-items: start;
+      }
+      .contact-text h2 {
+        font-family: var(--fd);
+        font-size: clamp(2rem, 3.5vw, 3.2rem);
+        font-weight: 700;
+        line-height: 1.15;
+        margin-bottom: 1.5rem;
+      }
+      .contact-text p {
+        color: var(--t2);
+        font-size: 1rem;
+        max-width: 420px;
+        margin-bottom: 2rem;
+      }
+      .contact-email {
+        font-family: var(--fd);
+        font-size: 1.3rem;
+        font-weight: 600;
+        color: var(--ac);
+        text-decoration: none;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.75rem;
+        transition: gap 0.3s;
+      }
+      .contact-email:hover {
+        gap: 1.25rem;
+      }
+      .contact-email svg {
+        width: 20px;
+        height: 20px;
+        transition: transform 0.3s;
+      }
+      .contact-email:hover svg {
+        transform: translateX(4px);
+      }
+      .cd {
+        padding-top: 1rem;
+      }
+      .cd-item {
+        padding: 1.5rem 0;
+        border-bottom: 1px solid var(--bd);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      .cd-item:first-child {
+        border-top: 1px solid var(--bd);
+      }
+      .cd-label {
+        font-size: 0.7rem;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: var(--t3);
+      }
+      .cd-val {
+        font-size: 0.95rem;
+        color: var(--t1);
+      }
+      .cd-val a {
+        color: var(--t1);
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+      .cd-val a:hover {
+        color: var(--ac);
+      }
+      .socials {
+        display: flex;
+        gap: 1.5rem;
+        margin-top: 2.5rem;
+      }
+      .socials a {
+        font-size: 0.72rem;
+        letter-spacing: 0.15em;
+        text-transform: uppercase;
+        color: var(--t3);
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+      .socials a:hover {
+        color: var(--ac);
+      }
+
+      footer {
+        padding: 2rem 3rem;
+        border-top: 1px solid var(--bd);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+      footer p {
+        font-size: 0.7rem;
+        color: var(--t3);
+        letter-spacing: 0.08em;
+      }
+
+      @keyframes fadeUp {
+        from {
+          opacity: 0;
+          transform: translateY(30px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+      @keyframes scrollPulse {
+        0%,
+        100% {
+          opacity: 0.3;
+        }
+        50% {
+          opacity: 0.8;
+        }
+      }
+      .reveal {
+        opacity: 0;
+        transform: translateY(25px);
+        transition:
+          opacity 0.8s,
+          transform 0.8s;
+      }
+      .reveal.visible {
+        opacity: 1;
+        transform: translateY(0);
+      }
+
+      @media (max-width: 900px) {
+        nav {
+          padding: 1.25rem 1.5rem;
+        }
+        nav.scrolled {
+          padding: 0.85rem 1.5rem;
+        }
+        .nav-links {
+          gap: 1.5rem;
+        }
+        .nav-links a {
+          font-size: 0.7rem;
+        }
+        section {
+          padding: 5rem 1.5rem;
+        }
+        .hero-content {
+          padding: 0 1.5rem 4rem;
+        }
+        .about {
+          grid-template-columns: 1fr;
+          gap: 3rem;
+        }
+        .about-img {
+          max-height: 400px;
+        }
+        .svc-grid {
+          grid-template-columns: 1fr;
+        }
+        .work-grid {
+          grid-template-columns: 1fr;
+        }
+        .work-item.feat {
+          grid-column: span 1;
+          aspect-ratio: 16/9;
+        }
+        .contact-inner {
+          grid-template-columns: 1fr;
+          gap: 3rem;
+        }
+        .hero-scroll {
+          display: none;
+        }
+      }
+      @media (max-width: 550px) {
+        .nav-links {
+          gap: 1rem;
+        }
+        .hero-title {
+          font-size: 2rem;
+        }
+        .stats {
+          flex-wrap: wrap;
+          gap: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <nav id="mainNav">
+      <a href="#" class="nav-logo">Alan <b>X</b></a>
+      <ul class="nav-links">
+        <li><a href="#work">Work</a></li>
+        <li><a href="#about">About</a></li>
+        <li><a href="#services">Services</a></li>
+        <li><a href="#contact">Contact</a></li>
+      </ul>
+    </nav>
+
+    <section class="hero" id="home">
+      <div class="hero-vid"><div class="hero-placeholder"></div></div>
+      <div class="hero-overlay"></div>
+      <div class="hero-content">
+        <div class="hero-tag">AI Film and Video Production</div>
+        <h1 class="hero-title">
+          Stories told through<br />film, code and craft
+        </h1>
+        <p class="hero-sub">
+          Screenwriter, filmmaker and AI generative video producer &#8212;
+          creating exceptional content using both traditional production and
+          AI-driven workflows.
+        </p>
+      </div>
+      <div class="hero-scroll">
+        <span>Scroll</span>
+        <div class="scroll-line"></div>
+      </div>
+    </section>
+
+    <section id="work">
+      <div class="work-inner">
+        <div class="slabel">Selected Work</div>
+        <div class="work-grid">
+          <div class="work-item feat reveal">
+            <div class="work-thumb"><span>Showreel / AI Video</span></div>
+            <div class="work-over">
+              <h3>AI Storybook</h3>
+              <p>AI Generative Video &#8212; 2025</p>
+            </div>
+          </div>
+          <div class="work-item reveal">
+            <div class="work-thumb"><span>Short Film</span></div>
+            <div class="work-over">
+              <h3>The Bench by the Sea</h3>
+              <p>Award-Winning Short &#8212; Worthing</p>
+            </div>
+          </div>
+          <div class="work-item reveal">
+            <div class="work-thumb"><span>Aerial</span></div>
+            <div class="work-over">
+              <h3>Drone Footage Reel</h3>
+              <p>Aerial Cinematography</p>
+            </div>
+          </div>
+          <div class="work-item reveal">
+            <div class="work-thumb"><span>Animation</span></div>
+            <div class="work-over">
+              <h3>3D Animation Reel</h3>
+              <p>3D Modelling and Animation</p>
+            </div>
+          </div>
+          <div class="work-item reveal">
+            <div class="work-thumb"><span>Music / Sound</span></div>
+            <div class="work-over">
+              <h3>Sound Design and Music</h3>
+              <p>Original Compositions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="about">
+      <div class="about">
+        <div class="about-text reveal">
+          <div class="slabel">About</div>
+          <h2>
+            Film, video and AI &#8212; built on decades of creative production
+          </h2>
+          <p>
+            With a career spanning traditional filmmaking, 3D animation, drone
+            cinematography, and now AI-powered video production, Alan brings a
+            rare depth of experience to every project.
+          </p>
+          <p>
+            Based on the South Coast, UK &#8212; working with clients locally
+            and worldwide. Currently expanding into AI generative video through
+            the Institute of Data and Marketing AI Film Production programme.
+          </p>
+          <div class="stats">
+            <div class="stat">
+              <span class="stat-num">15+</span
+              ><span class="stat-lbl">Years Experience</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">AI</span
+              ><span class="stat-lbl">Video Production</span>
+            </div>
+            <div class="stat">
+              <span class="stat-num">UK</span
+              ><span class="stat-lbl">and Worldwide</span>
+            </div>
+          </div>
+        </div>
+        <div class="about-img reveal">
+          <div class="about-img-ph">Photo</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="services" class="svc-section">
+      <div class="svc-inner">
+        <div class="slabel">Services</div>
+        <div class="svc-grid">
+          <div class="svc-card reveal">
+            <span class="svc-icon">&#9670;</span>
+            <h3>AI Video Production</h3>
+            <p>
+              Generative AI video content using cutting-edge prompt-driven
+              workflows &#8212; from concept through to finished piece.
+            </p>
+          </div>
+          <div class="svc-card reveal">
+            <span class="svc-icon">&#9678;</span>
+            <h3>Film and Video</h3>
+            <p>
+              Traditional film production, promotional video, corporate content,
+              and short films. End-to-end from scripting to final edit.
+            </p>
+          </div>
+          <div class="svc-card reveal">
+            <span class="svc-icon">&#9651;</span>
+            <h3>Drone and Aerial</h3>
+            <p>
+              Licensed aerial drone filming for cinematic establishing shots,
+              property, events, and landscape footage.
+            </p>
+          </div>
+          <div class="svc-card reveal">
+            <span class="svc-icon">&#9671;</span>
+            <h3>3D Animation</h3>
+            <p>
+              3D modelling, animation, and motion graphics for explainers, title
+              sequences, and visual effects.
+            </p>
+          </div>
+          <div class="svc-card reveal">
+            <span class="svc-icon">&#11041;</span>
+            <h3>Screenwriting</h3>
+            <p>
+              Original screenplays and scripts &#8212; narrative storytelling
+              crafted for screen, from short-form to feature concepts.
+            </p>
+          </div>
+          <div class="svc-card reveal">
+            <span class="svc-icon">&#8862;</span>
+            <h3>Sound and Music</h3>
+            <p>
+              Original music composition and sound design &#8212; atmospheric
+              scores and soundscapes for film and video projects.
+            </p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact" class="contact-section">
+      <div class="contact-inner">
+        <div class="contact-text reveal">
+          <div class="slabel">Get in Touch</div>
+          <h2>Let's make<br />something together</h2>
+          <p>
+            Whether it's a film project, AI-generated content, or a creative
+            collaboration &#8212; I'd love to hear from you.
+          </p>
+          <a href="mailto:alan@alanx.uk" class="contact-email"
+            >alan@alanx.uk
+            <svg
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <line x1="5" y1="12" x2="19" y2="12" />
+              <polyline points="12 5 19 12 12 19" /></svg
+          ></a>
+        </div>
+        <div class="cd reveal">
+          <div class="cd-item">
+            <span class="cd-label">Location</span
+            ><span class="cd-val">South Coast, UK</span>
+          </div>
+          <div class="cd-item">
+            <span class="cd-label">LinkedIn</span
+            ><span class="cd-val"
+              ><a href="https://linkedin.com/in/alanx/" target="_blank"
+                >linkedin.com/in/alanx</a
+              ></span
+            >
+          </div>
+          <div class="cd-item">
+            <span class="cd-label">Vimeo</span
+            ><span class="cd-val"
+              ><a href="https://vimeo.com/alanx" target="_blank"
+                >vimeo.com/alanx</a
+              ></span
+            >
+          </div>
+          <div class="cd-item">
+            <span class="cd-label">YouTube</span
+            ><span class="cd-val"
+              ><a href="https://youtube.com/user/XtraxLondon" target="_blank"
+                >youtube.com/XtraxLondon</a
+              ></span
+            >
+          </div>
+          <div class="socials">
+            <a href="https://linkedin.com/in/alanx/" target="_blank"
+              >LinkedIn</a
+            >
+            <a href="https://vimeo.com/alanx" target="_blank">Vimeo</a>
+            <a href="https://youtube.com/user/XtraxLondon" target="_blank"
+              >YouTube</a
+            >
+            <a href="https://soundcloud.com/alancrossfilm" target="_blank"
+              >SoundCloud</a
+            >
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <footer>
+      <p>&#169; 2025 Alan Cross. All rights reserved.</p>
+      <p>alanxai.com</p>
+    </footer>
+
+    <script>
+      var nav = document.getElementById('mainNav');
+      window.addEventListener('scroll', function () {
+        nav.classList.toggle('scrolled', window.scrollY > 60);
+      });
+      var reveals = document.querySelectorAll('.reveal');
+      var obs = new IntersectionObserver(
+        function (entries) {
+          entries.forEach(function (e, i) {
+            if (e.isIntersecting) {
+              setTimeout(function () {
+                e.target.classList.add('visible');
+              }, i * 80);
+              obs.unobserve(e.target);
+            }
+          });
+        },
+        { threshold: 0.15 },
+      );
+      reveals.forEach(function (el) {
+        obs.observe(el);
+      });
+    </script>
+  </body>
+</html>
