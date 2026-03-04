@@ -88,6 +88,3 @@ export function isPageIdle(): boolean {
   return currentlyIdle || document.hidden;
 }
 
-// Aliases used by components — same underlying idle tracking
-export const onVisibilityChange = onIdleChange;
-export const isTabHidden = isPageIdle;

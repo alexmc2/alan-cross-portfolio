@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { onVisibilityChange, isTabHidden } from '@/lib/media-lifecycle';
+import { onIdleChange, isPageIdle } from '@/lib/media-lifecycle';
 
 const HERO_OFFSCREEN_DELAY_MS = 3000;
 
@@ -39,7 +39,7 @@ export default function HeroVideo({
               clearTimeout(offscreenTimerRef.current);
               offscreenTimerRef.current = null;
             }
-            if (!isTabHidden()) {
+            if (!isPageIdle()) {
               setShouldLoad(true);
               videoRef.current?.play().catch(() => {});
             }
@@ -60,9 +60,9 @@ export default function HeroVideo({
     );
     observer.observe(node);
 
-    // Page Visibility API — unload on tab hide, reload on tab show
-    const unsubVisibility = onVisibilityChange((hidden) => {
-      if (hidden) {
+    // Idle detection — unload when idle, reload when active
+    const unsubIdle = onIdleChange((idle) => {
+      if (idle) {
         videoRef.current?.pause();
         setShouldLoad(false);
       } else if (isInViewRef.current) {
@@ -73,7 +73,7 @@ export default function HeroVideo({
 
     return () => {
       observer.disconnect();
-      unsubVisibility();
+      unsubIdle();
       if (offscreenTimerRef.current) {
         clearTimeout(offscreenTimerRef.current);
         offscreenTimerRef.current = null;

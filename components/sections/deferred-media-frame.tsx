@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
-import { onVisibilityChange, isTabHidden } from '@/lib/media-lifecycle';
+import { onIdleChange, isPageIdle } from '@/lib/media-lifecycle';
 
 const FRAME_READY_DELAY_MS = 2500;
 const UNLOAD_DELAY_MS = 8000;
@@ -37,19 +37,18 @@ export default function DeferredMediaFrame({
   const readyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInViewRef = useRef(false);
 
-  // Unload helper — clears ready state
-  const unload = () => {
-    if (readyTimerRef.current) {
-      clearTimeout(readyTimerRef.current);
-      readyTimerRef.current = null;
-    }
-    setShouldLoad(false);
-    setIsFrameReady(false);
-  };
-
   useEffect(() => {
     const node = containerRef.current;
     if (!node) return;
+
+    const unload = () => {
+      if (readyTimerRef.current) {
+        clearTimeout(readyTimerRef.current);
+        readyTimerRef.current = null;
+      }
+      setShouldLoad(false);
+      setIsFrameReady(false);
+    };
 
     const observer = new IntersectionObserver(
       (entries) => {
@@ -60,7 +59,7 @@ export default function DeferredMediaFrame({
               clearTimeout(unloadTimerRef.current);
               unloadTimerRef.current = null;
             }
-            if (!isTabHidden()) {
+            if (!isPageIdle()) {
               setShouldLoad(true);
             }
             // Resume a paused video when it re-enters the viewport
@@ -85,9 +84,9 @@ export default function DeferredMediaFrame({
 
     observer.observe(node);
 
-    // Page Visibility API — unload on tab hide, reload on tab show
-    const unsubVisibility = onVisibilityChange((hidden) => {
-      if (hidden) {
+    // Idle detection — unload when idle, reload when active
+    const unsubIdle = onIdleChange((idle) => {
+      if (idle) {
         videoRef.current?.pause();
         unload();
       } else if (isInViewRef.current) {
@@ -98,7 +97,7 @@ export default function DeferredMediaFrame({
 
     return () => {
       observer.disconnect();
-      unsubVisibility();
+      unsubIdle();
       if (unloadTimerRef.current) {
         clearTimeout(unloadTimerRef.current);
         unloadTimerRef.current = null;
