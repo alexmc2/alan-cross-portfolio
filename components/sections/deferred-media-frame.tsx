@@ -7,7 +7,7 @@ const FRAME_READY_DELAY_MS = 2500;
 const UNLOAD_DELAY_MS = 90000;
 const FRAME_ROOT_MARGIN = "1200px 0px";
 
-type DeferredVimeoFrameProps = {
+type DeferredMediaFrameProps = {
   mediaType?: "iframe" | "video";
   src: string;
   mimeType?: string;
@@ -18,7 +18,7 @@ type DeferredVimeoFrameProps = {
   posterBlurDataURL?: string;
 };
 
-export default function DeferredVimeoFrame({
+export default function DeferredMediaFrame({
   mediaType = "iframe",
   src,
   mimeType,
@@ -27,7 +27,7 @@ export default function DeferredVimeoFrame({
   fallbackLabel,
   posterSrc,
   posterBlurDataURL,
-}: DeferredVimeoFrameProps) {
+}: DeferredMediaFrameProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
   const [isFrameReady, setIsFrameReady] = useState(false);
@@ -150,7 +150,7 @@ export default function DeferredVimeoFrame({
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none"
             allow="autoplay; fullscreen; encrypted-media"
             allowFullScreen
-            loading="lazy"
+            loading="eager"
             title={title}
             onLoad={handleFrameLoad}
           />

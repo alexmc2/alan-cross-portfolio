@@ -7,7 +7,7 @@ import {
   youtubePosterUrl,
 } from '@/lib/utils';
 import Image from 'next/image';
-import DeferredVimeoFrame from './deferred-vimeo-frame';
+import DeferredMediaFrame from './deferred-media-frame';
 
 export default function Work({ items }: { items: PortfolioItem[] }) {
   return (
@@ -33,7 +33,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
             const posterSrc =
               thumbnailUrl ??
               (videoUrl ? vimeoPosterUrl(videoUrl) ?? youtubePosterUrl(videoUrl) : null);
-            const destinationHref = videoUrl || uploadedVideoUrl || '#';
+            const destinationHref = uploadedVideoUrl || videoUrl || '#';
             const imageSizes = item.featured ? '1200px' : '600px';
 
             return (
@@ -49,7 +49,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                 {/* Video / Thumbnail / Placeholder */}
                 <div className="w-full h-full">
                   {mediaSrc ? (
-                    <DeferredVimeoFrame
+                    <DeferredMediaFrame
                       mediaType={mediaType}
                       src={mediaSrc}
                       mimeType={uploadedVideoMimeType}
