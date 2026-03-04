@@ -1,14 +1,14 @@
-"use client";
+'use client';
 
-import Image from "next/image";
-import { useEffect, useRef, useState } from "react";
+import Image from 'next/image';
+import { useEffect, useRef, useState } from 'react';
 
 const FRAME_READY_DELAY_MS = 2500;
-const UNLOAD_DELAY_MS = 90000;
-const FRAME_ROOT_MARGIN = "1200px 0px";
+const UNLOAD_DELAY_MS = 12000;
+const FRAME_ROOT_MARGIN = '400px 0px';
 
 type DeferredMediaFrameProps = {
-  mediaType?: "iframe" | "video";
+  mediaType?: 'iframe' | 'video';
   src: string;
   mimeType?: string;
   title: string;
@@ -19,7 +19,7 @@ type DeferredMediaFrameProps = {
 };
 
 export default function DeferredMediaFrame({
-  mediaType = "iframe",
+  mediaType = 'iframe',
   src,
   mimeType,
   title,
@@ -29,6 +29,7 @@ export default function DeferredMediaFrame({
   posterBlurDataURL,
 }: DeferredMediaFrameProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const videoRef = useRef<HTMLVideoElement | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
   const [isFrameReady, setIsFrameReady] = useState(false);
   const unloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -47,7 +48,11 @@ export default function DeferredMediaFrame({
               unloadTimerRef.current = null;
             }
             setShouldLoad(true);
+            // Resume a paused video when it re-enters the viewport
+            videoRef.current?.play().catch(() => {});
           } else {
+            // Immediately pause video when offscreen — don't wait for unload
+            videoRef.current?.pause();
             if (unloadTimerRef.current) {
               clearTimeout(unloadTimerRef.current);
             }
@@ -64,7 +69,7 @@ export default function DeferredMediaFrame({
           }
         }
       },
-      { threshold: 0.01, rootMargin: FRAME_ROOT_MARGIN }
+      { threshold: 0.01, rootMargin: FRAME_ROOT_MARGIN },
     );
 
     observer.observe(node);
@@ -113,10 +118,11 @@ export default function DeferredMediaFrame({
       {posterSrc ? (
         <div
           className={`absolute inset-0 z-[1] pointer-events-none transition-opacity duration-500 ${
-            showPoster ? "opacity-100" : "opacity-0"
+            showPoster ? 'opacity-100' : 'opacity-0'
           }`}
           style={{
-            background: "linear-gradient(135deg, #0b0b0d, #141418 50%, #0d0d0f)",
+            background:
+              'linear-gradient(135deg, #0b0b0d, #141418 50%, #0d0d0f)',
           }}
         >
           <Image
@@ -125,15 +131,16 @@ export default function DeferredMediaFrame({
             fill
             className="object-cover"
             sizes={sizes}
-            placeholder={posterBlurDataURL ? "blur" : undefined}
+            placeholder={posterBlurDataURL ? 'blur' : undefined}
             blurDataURL={posterBlurDataURL}
           />
         </div>
       ) : null}
 
       {shouldLoad ? (
-        mediaType === "video" ? (
+        mediaType === 'video' ? (
           <video
+            ref={videoRef}
             autoPlay
             muted
             loop
@@ -142,7 +149,7 @@ export default function DeferredMediaFrame({
             className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             onLoadedData={handleFrameLoad}
           >
-            <source src={src} type={mimeType || "video/mp4"} />
+            <source src={src} type={mimeType || 'video/mp4'} />
           </video>
         ) : (
           <iframe
@@ -161,7 +168,8 @@ export default function DeferredMediaFrame({
         <div
           className="absolute inset-0 z-[1] pointer-events-none w-full h-full flex items-center justify-center"
           style={{
-            background: "linear-gradient(135deg, #151318, #1a1816 50%, #12110f)",
+            background:
+              'linear-gradient(135deg, #151318, #1a1816 50%, #12110f)',
           }}
         >
           <span className="text-[0.65rem] tracking-[0.25em] uppercase text-text-muted border border-[rgba(255,255,255,0.05)] px-5 py-2.5">
