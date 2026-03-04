@@ -2,10 +2,11 @@
 
 import Image from 'next/image';
 import { useEffect, useRef, useState } from 'react';
+import { onVisibilityChange, isTabHidden } from '@/lib/media-lifecycle';
 
 const FRAME_READY_DELAY_MS = 2500;
-const UNLOAD_DELAY_MS = 12000;
-const FRAME_ROOT_MARGIN = '400px 0px';
+const UNLOAD_DELAY_MS = 8000;
+const FRAME_ROOT_MARGIN = '300px 0px';
 
 type DeferredMediaFrameProps = {
   mediaType?: 'iframe' | 'video';
@@ -34,6 +35,17 @@ export default function DeferredMediaFrame({
   const [isFrameReady, setIsFrameReady] = useState(false);
   const unloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const readyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isInViewRef = useRef(false);
+
+  // Unload helper — clears ready state
+  const unload = () => {
+    if (readyTimerRef.current) {
+      clearTimeout(readyTimerRef.current);
+      readyTimerRef.current = null;
+    }
+    setShouldLoad(false);
+    setIsFrameReady(false);
+  };
 
   useEffect(() => {
     const node = containerRef.current;
@@ -43,27 +55,26 @@ export default function DeferredMediaFrame({
       (entries) => {
         for (const entry of entries) {
           if (entry.isIntersecting) {
+            isInViewRef.current = true;
             if (unloadTimerRef.current) {
               clearTimeout(unloadTimerRef.current);
               unloadTimerRef.current = null;
             }
-            setShouldLoad(true);
+            if (!isTabHidden()) {
+              setShouldLoad(true);
+            }
             // Resume a paused video when it re-enters the viewport
             videoRef.current?.play().catch(() => {});
           } else {
-            // Immediately pause video when offscreen — don't wait for unload
+            isInViewRef.current = false;
+            // Immediately pause video when offscreen
             videoRef.current?.pause();
             if (unloadTimerRef.current) {
               clearTimeout(unloadTimerRef.current);
             }
-            // Give brief scroll grace period so we don't thrash iframe mounts.
+            // Grace period before unloading to avoid thrash on quick scrolling
             unloadTimerRef.current = setTimeout(() => {
-              if (readyTimerRef.current) {
-                clearTimeout(readyTimerRef.current);
-                readyTimerRef.current = null;
-              }
-              setShouldLoad(false);
-              setIsFrameReady(false);
+              unload();
               unloadTimerRef.current = null;
             }, UNLOAD_DELAY_MS);
           }
@@ -73,8 +84,21 @@ export default function DeferredMediaFrame({
     );
 
     observer.observe(node);
+
+    // Page Visibility API — unload on tab hide, reload on tab show
+    const unsubVisibility = onVisibilityChange((hidden) => {
+      if (hidden) {
+        videoRef.current?.pause();
+        unload();
+      } else if (isInViewRef.current) {
+        setShouldLoad(true);
+        videoRef.current?.play().catch(() => {});
+      }
+    });
+
     return () => {
       observer.disconnect();
+      unsubVisibility();
       if (unloadTimerRef.current) {
         clearTimeout(unloadTimerRef.current);
         unloadTimerRef.current = null;

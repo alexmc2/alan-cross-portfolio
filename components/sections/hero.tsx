@@ -1,5 +1,6 @@
 import type { SiteSettings } from '@/types';
 import { vimeoEmbedUrl } from '@/lib/utils';
+import HeroVideo from './hero-video';
 
 export default function Hero({ settings }: { settings: SiteSettings }) {
   const videoUrl = settings.heroVideo?.asset?.url;
@@ -17,44 +18,15 @@ export default function Hero({ settings }: { settings: SiteSettings }) {
     >
       {/* Video background */}
       <div className="absolute inset-0 z-0">
-        {videoUrl ? (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="metadata"
-            className="w-full h-full object-cover"
-          >
-            <source src={videoUrl} type="video/mp4" />
-          </video>
-        ) : externalVideoUrl ? (
-          <div className="absolute inset-0 overflow-hidden">
-            <iframe
-              src={externalVideoUrl}
-              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none"
-              allow="autoplay; fullscreen; encrypted-media"
-              allowFullScreen
-              title={
-                settings.heroTitle
-                  ? `${settings.heroTitle} — showreel`
-                  : 'Hero showreel video'
-              }
-            />
-          </div>
-        ) : (
-          <div
-            className="w-full h-full relative"
-            style={{
-              background:
-                'linear-gradient(170deg, #1a1520, #0d1117 40%, #0a0f14 70%, #0a0a0a)',
-            }}
-          >
-            <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-body text-[0.75rem] tracking-[0.3em] uppercase text-text-muted border border-text-muted px-8 py-4 opacity-50">
-              &#9654; Showreel plays here
-            </span>
-          </div>
-        )}
+        <HeroVideo
+          uploadedVideoUrl={videoUrl}
+          externalVideoUrl={externalVideoUrl ?? undefined}
+          title={
+            settings.heroTitle
+              ? `${settings.heroTitle} — showreel`
+              : 'Hero showreel video'
+          }
+        />
       </div>
 
       {/* Edge overlay */}

@@ -13,6 +13,9 @@ export function useReveal() {
           if (entry.isIntersecting) {
             const id = setTimeout(() => {
               entry.target.classList.add("visible");
+              // Remove fired timeout from the array
+              const idx = timeouts.current.indexOf(id);
+              if (idx !== -1) timeouts.current.splice(idx, 1);
             }, i * 80);
             timeouts.current.push(id);
             observer.unobserve(entry.target);
@@ -26,6 +29,7 @@ export function useReveal() {
 
     return () => {
       timeouts.current.forEach(clearTimeout);
+      timeouts.current.length = 0;
       observer.disconnect();
     };
   }, []);
