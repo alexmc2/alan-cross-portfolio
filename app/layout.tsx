@@ -41,6 +41,11 @@ export default function RootLayout({
 }) {
   const sanityCdnOrigin = 'https://cdn.sanity.io';
   const sanityApiOrigin = `https://${projectId}.api.sanity.io`;
+  const vimeoPlayerOrigin = 'https://player.vimeo.com';
+  const vimeoCdnOrigin = 'https://i.vimeocdn.com';
+  const vumbnailOrigin = 'https://vumbnail.com';
+  const youtubeEmbedOrigin = 'https://www.youtube-nocookie.com';
+  const youtubeImageOrigin = 'https://i.ytimg.com';
 
   return (
     <html lang="en">
@@ -49,8 +54,18 @@ export default function RootLayout({
         <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href={sanityCdnOrigin} crossOrigin="anonymous" />
         <link rel="preconnect" href={sanityApiOrigin} crossOrigin="anonymous" />
+        <link rel="preconnect" href={vimeoPlayerOrigin} crossOrigin="anonymous" />
+        <link rel="preconnect" href={vimeoCdnOrigin} crossOrigin="anonymous" />
+        <link rel="preconnect" href={vumbnailOrigin} crossOrigin="anonymous" />
+        <link rel="preconnect" href={youtubeEmbedOrigin} crossOrigin="anonymous" />
+        <link rel="preconnect" href={youtubeImageOrigin} crossOrigin="anonymous" />
         <link rel="dns-prefetch" href={sanityCdnOrigin} />
         <link rel="dns-prefetch" href={sanityApiOrigin} />
+        <link rel="dns-prefetch" href={vimeoPlayerOrigin} />
+        <link rel="dns-prefetch" href={vimeoCdnOrigin} />
+        <link rel="dns-prefetch" href={vumbnailOrigin} />
+        <link rel="dns-prefetch" href={youtubeEmbedOrigin} />
+        <link rel="dns-prefetch" href={youtubeImageOrigin} />
       </head>
       <body className={`${fontDisplay.variable} ${fontBody.variable}`}>
         {children}

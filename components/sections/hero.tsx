@@ -23,6 +23,7 @@ export default function Hero({ settings }: { settings: SiteSettings }) {
             muted
             loop
             playsInline
+            preload="metadata"
             className="w-full h-full object-cover"
           >
             <source src={videoUrl} type="video/mp4" />

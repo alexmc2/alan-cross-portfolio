@@ -3,5 +3,12 @@ import { imageQuery } from "./shared/image";
 
 export const PORTFOLIO_ITEMS_QUERY = groq`*[_type == "portfolioItem"] | order(order asc){
   ...,
-  thumbnail{ ${imageQuery} }
+  thumbnail{ ${imageQuery} },
+  videoFile{
+    asset->{
+      _id,
+      url,
+      mimeType
+    }
+  }
 }`;

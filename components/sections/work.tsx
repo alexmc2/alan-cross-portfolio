@@ -1,7 +1,13 @@
 import type { PortfolioItem } from '@/types';
 import { urlFor } from '@/sanity/lib/image';
-import { vimeoEmbedUrl } from '@/lib/utils';
+import {
+  vimeoEmbedUrl,
+  vimeoPosterUrl,
+  youtubeEmbedUrl,
+  youtubePosterUrl,
+} from '@/lib/utils';
 import Image from 'next/image';
+import DeferredMediaFrame from './deferred-media-frame';
 
 export default function Work({ items }: { items: PortfolioItem[] }) {
   return (
@@ -10,9 +16,25 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
         <div className="slabel">Selected Work</div>
         <div className="grid grid-cols-2 gap-6 mt-12 max-[900px]:grid-cols-1">
           {items.map((item) => {
-            const embedSrc = item.vimeoUrl
-              ? vimeoEmbedUrl(item.vimeoUrl)
+            const videoUrl = item.videoUrl || item.vimeoUrl || null;
+            const uploadedVideoUrl = item.videoFile?.asset?.url || null;
+            const uploadedVideoMimeType = item.videoFile?.asset?.mimeType;
+            const vimeoSrc = videoUrl ? vimeoEmbedUrl(videoUrl) : null;
+            const youtubeSrc = !vimeoSrc && videoUrl ? youtubeEmbedUrl(videoUrl) : null;
+            const embeddedSrc = vimeoSrc || youtubeSrc;
+            const mediaSrc = uploadedVideoUrl || embeddedSrc;
+            const mediaType = uploadedVideoUrl ? 'video' : 'iframe';
+            const thumbnailUrl = item.thumbnail?.asset
+              ? urlFor(item.thumbnail)
+                  .width(1200)
+                  .height(item.featured ? 514 : 675)
+                  .url()
               : null;
+            const posterSrc =
+              thumbnailUrl ??
+              (videoUrl ? vimeoPosterUrl(videoUrl) ?? youtubePosterUrl(videoUrl) : null);
+            const destinationHref = uploadedVideoUrl || videoUrl || '#';
+            const imageSizes = item.featured ? '1200px' : '600px';
 
             return (
               <div
@@ -26,31 +48,30 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
               >
                 {/* Video / Thumbnail / Placeholder */}
                 <div className="w-full h-full">
-                  {embedSrc ? (
-                    <div className="absolute inset-0 overflow-hidden">
-                      <iframe
-                        src={embedSrc}
-                        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none"
-                        allow="autoplay; fullscreen; encrypted-media"
-                        allowFullScreen
-                        loading="lazy"
-                        title={item.title}
-                      />
-                    </div>
-                  ) : item.thumbnail?.asset ? (
+                  {mediaSrc ? (
+                    <DeferredMediaFrame
+                      mediaType={mediaType}
+                      src={mediaSrc}
+                      mimeType={uploadedVideoMimeType}
+                      title={item.title}
+                      fallbackLabel={item.category || 'Video'}
+                      sizes={imageSizes}
+                      posterSrc={posterSrc ?? undefined}
+                      posterBlurDataURL={item.thumbnail?.asset?.metadata?.lqip}
+                    />
+                  ) : thumbnailUrl ? (
                     <Image
-                      src={urlFor(item.thumbnail)
-                        .width(1200)
-                        .height(item.featured ? 514 : 675)
-                        .url()}
+                      src={thumbnailUrl}
                       alt={item.title}
                       fill
                       className="object-cover"
-                      sizes={item.featured ? '1200px' : '600px'}
+                      sizes={imageSizes}
                       placeholder={
-                        item.thumbnail.asset.metadata?.lqip ? 'blur' : undefined
+                        item.thumbnail?.asset?.metadata?.lqip
+                          ? 'blur'
+                          : undefined
                       }
-                      blurDataURL={item.thumbnail.asset.metadata?.lqip}
+                      blurDataURL={item.thumbnail?.asset?.metadata?.lqip}
                     />
                   ) : (
                     <div
@@ -69,10 +90,10 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
 
                 {/* Hover overlay */}
                 <a
-                  href={item.vimeoUrl || '#'}
-                  target={item.vimeoUrl ? '_blank' : undefined}
-                  rel={item.vimeoUrl ? 'noopener noreferrer' : undefined}
-                  className="absolute inset-x-0 bottom-0 flex flex-col justify-end p-4 opacity-100 md:inset-0 md:p-8 md:opacity-0 transition-opacity duration-400 md:group-hover:opacity-100 z-10"
+                  href={destinationHref}
+                  target={destinationHref !== '#' ? '_blank' : undefined}
+                  rel={destinationHref !== '#' ? 'noopener noreferrer' : undefined}
+                  className="absolute inset-x-0 bottom-0 flex flex-col justify-end p-4 opacity-100 md:inset-0 md:p-8 md:opacity-0 transition-opacity duration-400 md:group-hover:opacity-100 z-10 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto"
                   style={{
                     background:
                       'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 35%, transparent 100%)',

@@ -1,24 +1,17 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, type MouseEvent } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 
 export default function Nav() {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const pathname = usePathname();
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 60);
     window.addEventListener('scroll', handleScroll);
     return () => window.removeEventListener('scroll', handleScroll);
   }, []);
-
-  // Close mobile menu on route change
-  useEffect(() => {
-    setMobileOpen(false);
-  }, [pathname]);
 
   // Lock body scroll when mobile menu is open
   useEffect(() => {
@@ -37,6 +30,23 @@ export default function Nav() {
     { label: 'Contact', href: '/#contact' },
   ];
 
+  const handleBrandClick = (event: MouseEvent<HTMLAnchorElement>) => {
+    if (
+      event.defaultPrevented ||
+      event.button !== 0 ||
+      event.metaKey ||
+      event.ctrlKey ||
+      event.shiftKey ||
+      event.altKey
+    ) {
+      return;
+    }
+
+    event.preventDefault();
+    setMobileOpen(false);
+    window.location.assign('/');
+  };
+
   return (
     <>
       <nav
@@ -49,6 +59,7 @@ export default function Nav() {
         <Link
           href="/"
           className="font-display font-bold text-[1.25rem] tracking-[0.08em] uppercase text-text-primary no-underline"
+          onClick={handleBrandClick}
         >
           Alan <span className="text-white font-bold">X</span>
         </Link>
