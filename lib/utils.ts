@@ -74,7 +74,7 @@ const isYouTubeHostname = (hostname: string): boolean => {
  */
 export function normaliseVimeoUrl(
   raw: string,
-  options: VimeoEmbedOptions = {}
+  options: VimeoEmbedOptions = {},
 ): string {
   try {
     const url = new URL(raw);
@@ -122,7 +122,7 @@ export function normaliseVimeoUrl(
  */
 export function vimeoEmbedUrl(
   raw: string,
-  options: VimeoEmbedOptions = {}
+  options: VimeoEmbedOptions = {},
 ): string | null {
   try {
     const url = new URL(raw);
@@ -134,9 +134,11 @@ export function vimeoEmbedUrl(
 
     // Standard vimeo.com/12345 watch page
     if (isVimeoHostname(url.hostname)) {
-      const match = url.pathname.match(/\/(\d+)/);
-      if (match) {
-        const embedBase = `https://player.vimeo.com/video/${match[1]}`;
+      const videoSegment = url.pathname.match(/\/video\/(\d+)/);
+      const allNumeric = [...url.pathname.matchAll(/\/(\d+)/g)];
+      const id = videoSegment?.[1] ?? allNumeric.at(-1)?.[1];
+      if (id) {
+        const embedBase = `https://player.vimeo.com/video/${id}`;
         // Carry over the hash param (h=...) if present in the original
         const hParam = url.searchParams.get('h');
         const withH = hParam ? `${embedBase}?h=${hParam}` : embedBase;
@@ -161,10 +163,9 @@ export function vimeoVideoId(raw: string): string | null {
     const playerMatch = url.pathname.match(/\/video\/(\d+)/);
     if (playerMatch) return playerMatch[1];
 
-    const watchMatch = url.pathname.match(/\/(\d+)/);
-    if (watchMatch) return watchMatch[1];
-
-    return null;
+    // Fall back to last numeric segment to handle showcase/album paths
+    const allNumeric = [...url.pathname.matchAll(/\/(\d+)/g)];
+    return allNumeric.at(-1)?.[1] ?? null;
   } catch {
     return null;
   }
