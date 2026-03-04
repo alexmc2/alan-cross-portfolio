@@ -73,10 +73,14 @@ function init() {
   });
 }
 
-/** Subscribe to idle state changes. Returns an unsubscribe function. */
+/** Subscribe to idle state changes. Returns an unsubscribe function.
+ *  Fires immediately with the current state so late subscribers don't
+ *  miss an already-idle page (e.g. tab opened in background). */
 export function onIdleChange(cb: IdleCallback): () => void {
   init();
   listeners.add(cb);
+  const idle = isPageIdle();
+  if (idle) cb(idle);
   return () => {
     listeners.delete(cb);
   };
@@ -85,6 +89,7 @@ export function onIdleChange(cb: IdleCallback): () => void {
 /** Whether the page is currently idle. */
 export function isPageIdle(): boolean {
   if (typeof document === 'undefined') return false;
+  init();
   return currentlyIdle || document.hidden;
 }
 
