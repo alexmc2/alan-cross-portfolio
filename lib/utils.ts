@@ -102,6 +102,11 @@ export function normaliseVimeoUrl(
       url.searchParams.set('byline', '0');
       url.searchParams.set('portrait', '0');
       url.searchParams.set('controls', '0');
+    } else {
+      url.searchParams.set('title', '1');
+      url.searchParams.set('byline', '1');
+      url.searchParams.set('portrait', '1');
+      url.searchParams.set('controls', '1');
     }
 
     url.searchParams.set('dnt', dnt ? '1' : '0');
@@ -193,7 +198,7 @@ export function youtubeVideoId(raw: string): string | null {
     }
 
     if (url.pathname.startsWith('/watch')) {
-      return url.searchParams.get('v');
+      return url.searchParams.get('v') || null;
     }
 
     const embedMatch = url.pathname.match(/^\/embed\/([^/?#]+)/);
