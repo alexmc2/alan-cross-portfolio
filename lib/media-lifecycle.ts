@@ -31,6 +31,10 @@ function init() {
   if (initialized || typeof document === 'undefined') return;
   initialized = true;
 
+  // Sync internal state with reality at init time so notify() transitions
+  // work correctly even when the first subscriber mounts in a hidden tab.
+  currentlyIdle = document.hidden;
+
   // Tab switch (covers switching between browser tabs)
   document.addEventListener('visibilitychange', () => {
     if (document.hidden) {
