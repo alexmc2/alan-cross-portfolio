@@ -1,8 +1,11 @@
-import { MetadataRoute } from "next";
-import { groq } from "next-sanity";
-import { sanityFetch } from "@/sanity/lib/live";
+import { MetadataRoute } from 'next';
+import { groq } from 'next-sanity';
+import { siteUrl } from '@/lib/siteConfig';
+import { sanityFetch } from '@/sanity/lib/live';
 
-async function getPostsSitemap(baseUrl: string): Promise<MetadataRoute.Sitemap> {
+async function getPostsSitemap(
+  baseUrl: string,
+): Promise<MetadataRoute.Sitemap> {
   const postsQuery = groq`
     *[_type == 'post'] | order(_updatedAt desc) {
       'url': $baseUrl + '/blog/' + slug.current,
@@ -45,7 +48,7 @@ async function getPagesSitemap(baseUrl: string): Promise<MetadataRoute.Sitemap> 
 }
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://alanxai.com";
+  const baseUrl = siteUrl;
   const [pages, posts] = await Promise.all([getPagesSitemap(baseUrl), getPostsSitemap(baseUrl)]);
 
   const staticPages: MetadataRoute.Sitemap = [

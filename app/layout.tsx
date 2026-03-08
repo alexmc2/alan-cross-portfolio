@@ -3,18 +3,7 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { fontDisplay, fontBody } from '@/lib/fonts';
 import { projectId } from '@/sanity/env';
-
-const isProduction = process.env.NEXT_PUBLIC_SITE_ENV === 'production';
-const fallbackSiteUrl = 'http://localhost:3000';
-
-const metadataBase = (() => {
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL;
-  try {
-    return new URL(siteUrl ?? fallbackSiteUrl);
-  } catch {
-    return new URL(fallbackSiteUrl);
-  }
-})();
+import { isIndexableSite, metadataBase, siteUrl } from '@/lib/siteConfig';
 
 export const metadata: Metadata = {
   metadataBase,
@@ -30,8 +19,20 @@ export const metadata: Metadata = {
       'Screenwriter, filmmaker and AI generative video producer. Creating exceptional content using both traditional production and AI-driven workflows.',
     locale: 'en_GB',
     type: 'website',
+    url: siteUrl,
   },
-  robots: !isProduction ? 'noindex, nofollow' : 'index, follow',
+  alternates: {
+    canonical: '/',
+  },
+  robots: isIndexableSite
+    ? {
+        index: true,
+        follow: true,
+      }
+    : {
+        index: false,
+        follow: false,
+      },
 };
 
 export default function RootLayout({
@@ -40,12 +41,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const sanityCdnOrigin = 'https://cdn.sanity.io';
-  const sanityApiOrigin = `https://${projectId}.api.sanity.io`;
   const vimeoPlayerOrigin = 'https://player.vimeo.com';
-  const vimeoCdnOrigin = 'https://i.vimeocdn.com';
-  const vumbnailOrigin = 'https://vumbnail.com';
-  const youtubeEmbedOrigin = 'https://www.youtube-nocookie.com';
-  const youtubeImageOrigin = 'https://i.ytimg.com';
+  const dnsPrefetchOrigins = [
+    `https://${projectId}.api.sanity.io`,
+    'https://player.vimeo.com',
+    'https://i.vimeocdn.com',
+    'https://vumbnail.com',
+    'https://www.youtube-nocookie.com',
+    'https://i.ytimg.com',
+  ];
 
   return (
     <html lang="en">
@@ -53,21 +57,18 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href={sanityCdnOrigin} crossOrigin="anonymous" />
-        <link rel="preconnect" href={sanityApiOrigin} crossOrigin="anonymous" />
         <link rel="preconnect" href={vimeoPlayerOrigin} crossOrigin="anonymous" />
-        <link rel="preconnect" href={vimeoCdnOrigin} crossOrigin="anonymous" />
-        <link rel="preconnect" href={vumbnailOrigin} crossOrigin="anonymous" />
-        <link rel="preconnect" href={youtubeEmbedOrigin} crossOrigin="anonymous" />
-        <link rel="preconnect" href={youtubeImageOrigin} crossOrigin="anonymous" />
-        <link rel="dns-prefetch" href={sanityCdnOrigin} />
-        <link rel="dns-prefetch" href={sanityApiOrigin} />
-        <link rel="dns-prefetch" href={vimeoPlayerOrigin} />
-        <link rel="dns-prefetch" href={vimeoCdnOrigin} />
-        <link rel="dns-prefetch" href={vumbnailOrigin} />
-        <link rel="dns-prefetch" href={youtubeEmbedOrigin} />
-        <link rel="dns-prefetch" href={youtubeImageOrigin} />
+        {dnsPrefetchOrigins.map((origin) => (
+          <link key={origin} rel="dns-prefetch" href={origin} />
+        ))}
       </head>
       <body className={`${fontDisplay.variable} ${fontBody.variable}`}>
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-white focus:px-4 focus:py-2 focus:text-black"
+        >
+          Skip to content
+        </a>
         {children}
         <Analytics />
       </body>

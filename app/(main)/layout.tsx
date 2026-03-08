@@ -11,8 +11,8 @@ export default async function MainLayout({
   const { isEnabled: isDraftMode } = await draftMode();
   return (
     <>
-      {children}
-      <SanityLive />
+      <main id="main-content">{children}</main>
+      {isDraftMode && <SanityLive />}
       {isDraftMode && (
         <>
           <DisableDraftMode />
