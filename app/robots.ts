@@ -1,14 +1,14 @@
-// app/robots.ts
-import { MetadataRoute } from "next";
+import { MetadataRoute } from 'next';
+import { isIndexableSite, siteUrl } from '@/lib/siteConfig';
 
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
       {
-        userAgent: "*",
-        allow: "/",
+        userAgent: '*',
+        ...(isIndexableSite ? { allow: '/' } : { disallow: '/' }),
       },
     ],
-    sitemap: [`${process.env.NEXT_PUBLIC_SITE_URL}/sitemap.xml`],
+    sitemap: [`${siteUrl}/sitemap.xml`],
   };
 }

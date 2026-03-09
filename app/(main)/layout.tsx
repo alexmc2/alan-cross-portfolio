@@ -12,7 +12,7 @@ export default async function MainLayout({
   return (
     <>
       {children}
-      <SanityLive />
+      {isDraftMode && <SanityLive />}
       {isDraftMode && (
         <>
           <DisableDraftMode />
