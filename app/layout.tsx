@@ -69,7 +69,9 @@ export default function RootLayout({
         >
           Skip to content
         </a>
-        {children}
+        <main id="main-content" tabIndex={-1}>
+          {children}
+        </main>
         <Analytics />
       </body>
     </html>
