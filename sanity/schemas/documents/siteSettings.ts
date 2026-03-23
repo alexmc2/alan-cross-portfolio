@@ -125,6 +125,25 @@ export default defineType({
       options: { hotspot: true },
     }),
     defineField({
+      name: 'aboutImagePosition',
+      title: 'About Image Position',
+      description:
+        'Controls which part of the About image stays visible on the site. Use the hotspot editor for finer control if needed.',
+      type: 'string',
+      group: 'about',
+      options: {
+        list: [
+          { title: 'Top', value: 'top' },
+          { title: 'Upper', value: 'upper' },
+          { title: 'Center', value: 'center' },
+          { title: 'Lower', value: 'lower' },
+          { title: 'Bottom', value: 'bottom' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'upper',
+    }),
+    defineField({
       name: 'stats',
       title: 'Stats',
       description:

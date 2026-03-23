@@ -19,6 +19,7 @@ export type SiteSettings = {
   aboutHeading?: string;
   aboutBody?: any[];
   aboutImage?: SanityImage;
+  aboutImagePosition?: 'top' | 'upper' | 'center' | 'lower' | 'bottom';
   stats?: Array<{
     _key: string;
     number: string;

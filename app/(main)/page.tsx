@@ -12,6 +12,7 @@ import Services from '@/components/sections/services';
 import Contact from '@/components/sections/contact';
 import SiteFooter from '@/components/sections/site-footer';
 import HomepageClient from '@/components/homepage-client';
+import BackToTop from '@/components/back-to-top';
 import type {
   SiteSettings,
   PortfolioItem,
@@ -41,6 +42,7 @@ export default async function IndexPage() {
       <Work items={items} />
       <Services services={servicesList} />
       <Contact settings={siteSettings} contactDetails={details} />
+      <BackToTop />
       <SiteFooter />
     </HomepageClient>
   );
