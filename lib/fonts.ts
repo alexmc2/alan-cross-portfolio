@@ -1,8 +1,8 @@
-import { Syne, Outfit } from "next/font/google";
+import { Poppins, Outfit } from "next/font/google";
 
-export const fontDisplay = Syne({
+export const fontDisplay = Poppins({
   subsets: ["latin"],
-  weight: ["400", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
   variable: "--font-display",
   display: "swap",
   preload: true,
