@@ -41,6 +41,7 @@ export async function POST(request: NextRequest) {
       revalidated: ['sanity', 'sanity:fetch-sync-tags'],
       documentId: body._id ?? null,
       documentType: body._type ?? null,
+      revision: body._rev ?? null,
     });
   } catch (err) {
     console.error('Failed to handle Sanity revalidate webhook', err);
