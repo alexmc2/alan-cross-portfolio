@@ -30,6 +30,15 @@ export default function Contact({
   settings: SiteSettings;
   contactDetails: ContactDetail[];
 }) {
+  const directDetails = contactDetails.filter(
+    (detail) =>
+      detail.detailType === 'phone' || detail.detailType === 'location'
+  );
+  const onlineDetails = contactDetails.filter(
+    (detail) =>
+      detail.detailType === 'social' || detail.detailType === 'website'
+  );
+
   return (
     <section
       id="contact"
@@ -69,11 +78,35 @@ export default function Contact({
               </svg>
             </a>
           )}
+          {directDetails.length > 0 && (
+            <div className="mt-6 flex flex-col gap-2 text-[0.85rem] text-text-secondary">
+              {directDetails.map((detail) => {
+                const href =
+                  detail.detailType === 'phone'
+                    ? resolveHref(detail)
+                    : undefined;
+
+                if (href) {
+                  return (
+                    <a
+                      key={detail._id}
+                      href={href}
+                      className="text-text-secondary no-underline transition-colors duration-300 hover:text-text-primary"
+                    >
+                      {detail.value}
+                    </a>
+                  );
+                }
+
+                return <span key={detail._id}>{detail.value}</span>;
+              })}
+            </div>
+          )}
         </div>
 
         {/* Right column */}
         <div className="pt-4 reveal">
-          {contactDetails.map((detail, i) => {
+          {onlineDetails.map((detail, i) => {
             const href = resolveHref(detail);
             return (
               <div
@@ -89,18 +122,8 @@ export default function Contact({
                   {href ? (
                     <a
                       href={href}
-                      target={
-                        detail.detailType === 'phone' ||
-                        detail.detailType === 'email'
-                          ? undefined
-                          : '_blank'
-                      }
-                      rel={
-                        detail.detailType === 'phone' ||
-                        detail.detailType === 'email'
-                          ? undefined
-                          : 'noopener noreferrer'
-                      }
+                      target="_blank"
+                      rel="noopener noreferrer"
                       className="text-text-primary no-underline transition-colors duration-300 hover:text-accent"
                     >
                       {detail.value}
