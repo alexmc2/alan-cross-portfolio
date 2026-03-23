@@ -1,18 +1,51 @@
+'use client';
+
+import { useState } from 'react';
 import type { PortfolioItem } from '@/types';
 import { urlFor } from '@/sanity/lib/image';
-import {
-  resolveExternalMediaSource,
-} from '@/lib/utils';
+import { resolveExternalMediaSource } from '@/lib/utils';
 import Image from 'next/image';
 import DeferredMediaFrame from './deferred-media-frame';
 
+const MOBILE_VISIBLE_ITEMS = 5;
+
 export default function Work({ items }: { items: PortfolioItem[] }) {
+  const [visibleCount, setVisibleCount] = useState(MOBILE_VISIBLE_ITEMS);
+  const [animatedRange, setAnimatedRange] = useState<{
+    start: number;
+    end: number;
+  } | null>(null);
+  const hasToggle = items.length > MOBILE_VISIBLE_ITEMS;
+  const hasMoreItems = visibleCount < items.length;
+
+  const handleToggle = () => {
+    setVisibleCount((count) => {
+      if (count < items.length) {
+        const nextCount = Math.min(count + MOBILE_VISIBLE_ITEMS, items.length);
+        setAnimatedRange({ start: count, end: nextCount });
+        return nextCount;
+      }
+
+      setAnimatedRange(null);
+      return MOBILE_VISIBLE_ITEMS;
+    });
+  };
+
   return (
     <section id="work" className="py-28 px-12 max-md:py-20 max-md:px-6">
       <div className="max-w-[1200px] mx-auto">
         <div className="slabel">Selected Work</div>
-        <div className="grid grid-cols-2 gap-6 mt-12 max-[900px]:grid-cols-1">
-          {items.map((item) => {
+        <div
+          id="work-grid"
+          className="grid grid-cols-2 gap-6 mt-12 max-[900px]:grid-cols-1"
+        >
+          {items.map((item, index) => {
+            const isHiddenOnMobile = index >= visibleCount;
+            const isNewlyVisible =
+              animatedRange &&
+              index >= animatedRange.start &&
+              index < animatedRange.end &&
+              !isHiddenOnMobile;
             const videoUrl = item.videoUrl || item.vimeoUrl || null;
             const uploadedVideoUrl = item.videoFile?.asset?.url || null;
             const uploadedVideoMimeType = item.videoFile?.asset?.mimeType;
@@ -43,8 +76,15 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                   item.featured
                     ? 'col-span-2 aspect-[21/9] max-[900px]:col-span-1 max-[900px]:aspect-video'
                     : 'aspect-video'
+                } ${isHiddenOnMobile ? 'max-[900px]:hidden' : ''} ${
+                  isNewlyVisible ? 'max-[900px]:animate-fade-up' : ''
                 }`}
-                style={{ background: 'var(--color-bg-card)' }}
+                style={{
+                  background: 'var(--color-bg-card)',
+                  animationDelay: isNewlyVisible
+                    ? `${(index - animatedRange.start) * 90}ms`
+                    : undefined,
+                }}
               >
                 {/* Video / Thumbnail / Placeholder */}
                 <div className="w-full h-full">
@@ -112,6 +152,33 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
             );
           })}
         </div>
+        {hasToggle ? (
+          <button
+            type="button"
+            onClick={handleToggle}
+            aria-expanded={!hasMoreItems}
+            aria-controls="work-grid"
+            className="mt-8 hidden max-[900px]:inline-flex items-center gap-2 bg-transparent p-0 text-[0.7rem] tracking-[0.2em] uppercase text-accent transition-opacity duration-300 hover:opacity-80"
+          >
+            <span>{hasMoreItems ? 'See more work' : 'See less work'}</span>
+            <svg
+              viewBox="0 0 12 12"
+              aria-hidden="true"
+              className={`h-3 w-3 transition-transform duration-300 ${
+                hasMoreItems ? '' : 'rotate-180'
+              }`}
+              fill="none"
+            >
+              <path
+                d="M2.5 4.5 6 8l3.5-3.5"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        ) : null}
       </div>
     </section>
   );

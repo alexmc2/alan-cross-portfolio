@@ -3,7 +3,18 @@ import { urlFor } from '@/sanity/lib/image';
 import Image from 'next/image';
 import { PortableText } from '@portabletext/react';
 
+const aboutImagePositions = {
+  top: '50% 12%',
+  upper: '50% 26%',
+  center: '50% 50%',
+  lower: '50% 68%',
+  bottom: '50% 84%',
+} as const;
+
 export default function About({ settings }: { settings: SiteSettings }) {
+  const objectPosition =
+    aboutImagePositions[settings.aboutImagePosition ?? 'upper'];
+
   return (
     <section
       id="about"
@@ -40,14 +51,15 @@ export default function About({ settings }: { settings: SiteSettings }) {
         </div>
 
         {/* Image column */}
-        <div className="relative aspect-[4/5] bg-bg-card overflow-hidden reveal max-[900px]:max-h-[400px] max-[900px]:w-full max-[900px]:mx-auto">
+        <div className="relative w-full max-w-[420px] justify-self-end aspect-[3/4] bg-bg-card overflow-hidden reveal max-[900px]:max-w-none max-[900px]:max-h-[300px] max-[900px]:w-full max-[900px]:mx-auto">
           {settings.aboutImage?.asset ? (
             <Image
-              src={urlFor(settings.aboutImage).width(600).height(750).url()}
+              src={urlFor(settings.aboutImage).width(500).fit('max').url()}
               alt="About Alan Cross"
               fill
               className="object-cover"
-              sizes="600px"
+              style={{ objectPosition }}
+              sizes="500px"
               placeholder={
                 settings.aboutImage.asset.metadata?.lqip ? 'blur' : undefined
               }

@@ -28,6 +28,9 @@ export default defineType({
         list: [
           { title: 'AI Video', value: 'AI Video' },
           { title: 'Short Film', value: 'Short Film' },
+          { title: 'Narrative', value: 'Narrative' },
+          { title: 'Motion Graphics', value: 'Motion Graphics' },
+          { title: 'Community Film', value: 'Community Film' },
           { title: 'Aerial', value: 'Aerial' },
           { title: 'Animation', value: 'Animation' },
           { title: 'Sound', value: 'Sound' },
