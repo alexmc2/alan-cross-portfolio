@@ -63,7 +63,8 @@ export default defineType({
     defineField({
       name: 'heroVideoUrl',
       title: 'Hero Video URL (Fallback)',
-      description: 'External video URL if not uploading directly',
+      description:
+        'External video URL from Vimeo, YouTube, Cloudinary, or a direct MP4/WebM file if not uploading directly',
       type: 'url',
       group: 'hero',
     }),

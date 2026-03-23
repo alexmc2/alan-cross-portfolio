@@ -1,10 +1,7 @@
 import type { PortfolioItem } from '@/types';
 import { urlFor } from '@/sanity/lib/image';
 import {
-  vimeoEmbedUrl,
-  vimeoPosterUrl,
-  youtubeEmbedUrl,
-  youtubePosterUrl,
+  resolveExternalMediaSource,
 } from '@/lib/utils';
 import Image from 'next/image';
 import DeferredMediaFrame from './deferred-media-frame';
@@ -19,20 +16,23 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
             const videoUrl = item.videoUrl || item.vimeoUrl || null;
             const uploadedVideoUrl = item.videoFile?.asset?.url || null;
             const uploadedVideoMimeType = item.videoFile?.asset?.mimeType;
-            const vimeoSrc = videoUrl ? vimeoEmbedUrl(videoUrl) : null;
-            const youtubeSrc = !vimeoSrc && videoUrl ? youtubeEmbedUrl(videoUrl) : null;
-            const embeddedSrc = vimeoSrc || youtubeSrc;
-            const mediaSrc = uploadedVideoUrl || embeddedSrc;
-            const mediaType = uploadedVideoUrl ? 'video' : 'iframe';
+            const externalMedia = videoUrl
+              ? resolveExternalMediaSource(videoUrl)
+              : null;
+            const mediaSrc = uploadedVideoUrl || externalMedia?.src || null;
+            const mediaType = uploadedVideoUrl
+              ? 'video'
+              : externalMedia?.mediaType;
+            const mediaMimeType = uploadedVideoUrl
+              ? uploadedVideoMimeType
+              : externalMedia?.mimeType;
             const thumbnailUrl = item.thumbnail?.asset
               ? urlFor(item.thumbnail)
                   .width(1200)
                   .height(item.featured ? 514 : 675)
                   .url()
               : null;
-            const posterSrc =
-              thumbnailUrl ??
-              (videoUrl ? vimeoPosterUrl(videoUrl) ?? youtubePosterUrl(videoUrl) : null);
+            const posterSrc = thumbnailUrl ?? externalMedia?.posterSrc ?? null;
             const destinationHref = uploadedVideoUrl || videoUrl || '#';
             const imageSizes = item.featured ? '1200px' : '600px';
 
@@ -52,7 +52,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                     <DeferredMediaFrame
                       mediaType={mediaType}
                       src={mediaSrc}
-                      mimeType={uploadedVideoMimeType}
+                      mimeType={mediaMimeType}
                       title={item.title}
                       fallbackLabel={item.category || 'Video'}
                       sizes={imageSizes}

@@ -7,13 +7,19 @@ const HERO_OFFSCREEN_DELAY_MS = 3000;
 
 type HeroVideoProps = {
   uploadedVideoUrl?: string;
-  externalVideoUrl?: string;
+  uploadedVideoMimeType?: string;
+  externalMediaSrc?: string;
+  externalMediaType?: 'iframe' | 'video';
+  externalMediaMimeType?: string;
   title: string;
 };
 
 export default function HeroVideo({
   uploadedVideoUrl,
-  externalVideoUrl,
+  uploadedVideoMimeType,
+  externalMediaSrc,
+  externalMediaType,
+  externalMediaMimeType,
   title,
 }: HeroVideoProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
@@ -22,7 +28,7 @@ export default function HeroVideo({
   const isInViewRef = useRef(true);
   const offscreenTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const hasMedia = Boolean(uploadedVideoUrl || externalVideoUrl);
+  const hasMedia = Boolean(uploadedVideoUrl || externalMediaSrc);
 
   useEffect(() => {
     if (!hasMedia) return;
@@ -79,7 +85,7 @@ export default function HeroVideo({
         offscreenTimerRef.current = null;
       }
     };
-  }, [hasMedia, uploadedVideoUrl, externalVideoUrl]);
+  }, [hasMedia, uploadedVideoUrl, externalMediaSrc, externalMediaType]);
 
   if (!hasMedia) {
     return (
@@ -110,16 +116,38 @@ export default function HeroVideo({
             preload="metadata"
             className="w-full h-full object-cover"
           >
-            <source src={uploadedVideoUrl} type="video/mp4" />
+            <source
+              src={uploadedVideoUrl}
+              {...(uploadedVideoMimeType ? { type: uploadedVideoMimeType } : {})}
+            />
           </video>
-        ) : externalVideoUrl ? (
-          <iframe
-            src={externalVideoUrl}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none"
-            allow="autoplay; fullscreen; encrypted-media"
-            allowFullScreen
-            title={title}
-          />
+        ) : externalMediaSrc ? (
+          externalMediaType === 'video' ? (
+            <video
+              ref={videoRef}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="metadata"
+              className="w-full h-full object-cover"
+            >
+              <source
+                src={externalMediaSrc}
+                {...(externalMediaMimeType
+                  ? { type: externalMediaMimeType }
+                  : {})}
+              />
+            </video>
+          ) : (
+            <iframe
+              src={externalMediaSrc}
+              className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none"
+              allow="autoplay; fullscreen; encrypted-media"
+              allowFullScreen
+              title={title}
+            />
+          )
         ) : null
       ) : (
         <div

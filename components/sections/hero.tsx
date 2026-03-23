@@ -1,12 +1,13 @@
 import type { SiteSettings } from '@/types';
-import { vimeoEmbedUrl } from '@/lib/utils';
+import { resolveExternalMediaSource } from '@/lib/utils';
 import HeroVideo from './hero-video';
 
 export default function Hero({ settings }: { settings: SiteSettings }) {
   const videoUrl = settings.heroVideo?.asset?.url;
-  const externalVideoUrl = settings.heroVideoUrl
-    ? vimeoEmbedUrl(settings.heroVideoUrl)
-    : undefined;
+  const videoMimeType = settings.heroVideo?.asset?.mimeType;
+  const externalMedia = settings.heroVideoUrl
+    ? resolveExternalMediaSource(settings.heroVideoUrl)
+    : null;
   const height = settings.heroHeight || '75vh';
   const edgeStyle = settings.heroEdgeStyle || 'gradient';
 
@@ -20,7 +21,10 @@ export default function Hero({ settings }: { settings: SiteSettings }) {
       <div className="absolute inset-0 z-0">
         <HeroVideo
           uploadedVideoUrl={videoUrl}
-          externalVideoUrl={externalVideoUrl ?? undefined}
+          uploadedVideoMimeType={videoMimeType}
+          externalMediaSrc={externalMedia?.src}
+          externalMediaType={externalMedia?.mediaType}
+          externalMediaMimeType={externalMedia?.mimeType}
           title={
             settings.heroTitle
               ? `${settings.heroTitle} — showreel`
