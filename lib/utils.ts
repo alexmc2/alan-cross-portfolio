@@ -46,6 +46,22 @@ type VimeoEmbedOptions = {
   dnt?: boolean;
 };
 
+export type ExternalMediaSource = {
+  mediaType: 'iframe' | 'video';
+  src: string;
+  mimeType?: string;
+  posterSrc?: string | null;
+};
+
+const DIRECT_VIDEO_MIME_TYPES: Record<string, string> = {
+  mp4: 'video/mp4',
+  m4v: 'video/mp4',
+  webm: 'video/webm',
+  ogg: 'video/ogg',
+  ogv: 'video/ogg',
+  mov: 'video/quicktime',
+};
+
 const hasDomain = (hostname: string, domain: string): boolean => {
   return hostname === domain || hostname.endsWith(`.${domain}`);
 };
@@ -63,6 +79,61 @@ const isYouTubeHostname = (hostname: string): boolean => {
     hasDomain(lower, 'youtube-nocookie.com')
   );
 };
+
+const isCloudinaryHostname = (hostname: string): boolean => {
+  return hasDomain(hostname.toLowerCase(), 'res.cloudinary.com');
+};
+
+const isCloudinaryVideoUrl = (url: URL): boolean => {
+  if (!isCloudinaryHostname(url.hostname)) return false;
+
+  return (
+    url.pathname.includes('/video/upload/') ||
+    url.pathname.includes('/video/private/') ||
+    url.pathname.includes('/video/authenticated/')
+  );
+};
+
+export function directVideoMimeType(raw: string): string | null {
+  try {
+    const url = new URL(raw);
+    const extension = url.pathname.match(/\.([a-z0-9]+)$/i)?.[1]?.toLowerCase();
+    return extension ? DIRECT_VIDEO_MIME_TYPES[extension] ?? null : null;
+  } catch {
+    return null;
+  }
+}
+
+export function isDirectVideoUrl(raw: string): boolean {
+  try {
+    const url = new URL(raw);
+    if (!/^https?:$/.test(url.protocol)) return false;
+
+    return Boolean(directVideoMimeType(raw) || isCloudinaryVideoUrl(url));
+  } catch {
+    return false;
+  }
+}
+
+export function cloudinaryPosterUrl(raw: string): string | null {
+  try {
+    const url = new URL(raw);
+    const marker = '/video/upload/';
+    if (!isCloudinaryVideoUrl(url) || !url.pathname.includes(marker)) return null;
+
+    const markerIndex = url.pathname.indexOf(marker);
+    const prefix = url.pathname.slice(0, markerIndex + marker.length);
+    const remainder = url.pathname.slice(markerIndex + marker.length);
+    const posterPath = /\.[a-z0-9]+$/i.test(remainder)
+      ? remainder.replace(/\.[a-z0-9]+$/i, '.jpg')
+      : `${remainder}.jpg`;
+
+    url.pathname = `${prefix}so_1,f_jpg/${posterPath}`;
+    return url.toString();
+  } catch {
+    return null;
+  }
+}
 
 /**
  * Normalise a Vimeo player URL for reliable background-style embedding.
@@ -245,4 +316,37 @@ export function youtubeEmbedUrl(raw: string): string | null {
 export function youtubePosterUrl(raw: string): string | null {
   const id = youtubeVideoId(raw);
   return id ? `https://i.ytimg.com/vi/${id}/hqdefault.jpg` : null;
+}
+
+export function resolveExternalMediaSource(
+  raw: string,
+): ExternalMediaSource | null {
+  const vimeoSrc = vimeoEmbedUrl(raw);
+  if (vimeoSrc) {
+    return {
+      mediaType: 'iframe',
+      src: vimeoSrc,
+      posterSrc: vimeoPosterUrl(raw),
+    };
+  }
+
+  const youtubeSrc = youtubeEmbedUrl(raw);
+  if (youtubeSrc) {
+    return {
+      mediaType: 'iframe',
+      src: youtubeSrc,
+      posterSrc: youtubePosterUrl(raw),
+    };
+  }
+
+  if (isDirectVideoUrl(raw)) {
+    return {
+      mediaType: 'video',
+      src: raw,
+      mimeType: directVideoMimeType(raw) ?? undefined,
+      posterSrc: cloudinaryPosterUrl(raw),
+    };
+  }
+
+  return null;
 }

@@ -41,9 +41,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   const sanityCdnOrigin = 'https://cdn.sanity.io';
+  const cloudinaryOrigin = 'https://res.cloudinary.com';
   const vimeoPlayerOrigin = 'https://player.vimeo.com';
   const dnsPrefetchOrigins = [
     `https://${projectId}.api.sanity.io`,
+    cloudinaryOrigin,
     'https://player.vimeo.com',
     'https://i.vimeocdn.com',
     'https://vumbnail.com',
@@ -57,6 +59,7 @@ export default function RootLayout({
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
         <link rel="preconnect" href={sanityCdnOrigin} crossOrigin="anonymous" />
+        <link rel="preconnect" href={cloudinaryOrigin} crossOrigin="anonymous" />
         <link rel="preconnect" href={vimeoPlayerOrigin} crossOrigin="anonymous" />
         {dnsPrefetchOrigins.map((origin) => (
           <link key={origin} rel="dns-prefetch" href={origin} />

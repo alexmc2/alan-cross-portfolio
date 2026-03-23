@@ -45,7 +45,7 @@ export default defineType({
       name: 'videoUrl',
       title: 'Video URL',
       description:
-        'Paste a video URL from Vimeo or YouTube. For other providers, upload a video file instead.',
+        'Paste a video URL from Vimeo, YouTube, Cloudinary, or a direct MP4/WebM file. Uploads still work too.',
       type: 'url',
     }),
     defineField({

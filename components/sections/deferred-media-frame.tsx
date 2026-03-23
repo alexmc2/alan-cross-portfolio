@@ -172,7 +172,7 @@ export default function DeferredMediaFrame({
             className="absolute inset-0 w-full h-full object-cover pointer-events-none"
             onLoadedData={handleFrameLoad}
           >
-            <source src={src} type={mimeType || 'video/mp4'} />
+            <source src={src} {...(mimeType ? { type: mimeType } : {})} />
           </video>
         ) : (
           <iframe

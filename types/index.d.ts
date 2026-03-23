@@ -10,6 +10,7 @@ export type SiteSettings = {
     asset?: {
       _id: string;
       url: string;
+      mimeType?: string;
     };
   };
   heroVideoUrl?: string;
