@@ -3,7 +3,7 @@ import {
   htmlToBlocks,
   randomKey,
   type DeserializerRule,
-} from "@sanity/block-tools";
+} from "@portabletext/block-tools";
 import { Schema } from "@sanity/schema";
 import { load, type CheerioAPI } from "cheerio";
 import * as dotenv from "dotenv";
@@ -50,6 +50,11 @@ const compiledSchema = Schema.compile({
       fields: [{ name: "body", type: "block-content" }],
     },
     {
+      name: "page",
+      type: "document",
+      fields: [{ name: "title", type: "string" }],
+    },
+    {
       name: "block-content",
       title: "Block Content",
       type: "array",
@@ -77,14 +82,34 @@ const compiledSchema = Schema.compile({
               {
                 name: "link",
                 type: "object",
-                fields: [{ name: "href", type: "url" }],
+                fields: [
+                  { name: "isExternal", type: "boolean" },
+                  {
+                    name: "internalLink",
+                    type: "reference",
+                    to: [{ type: "page" }, { type: "post" }],
+                  },
+                  { name: "href", type: "url" },
+                  { name: "target", type: "boolean" },
+                ],
               },
             ],
           },
         },
         {
-          type: "image",
-          fields: [{ name: "alt", type: "string" }],
+          name: "image",
+          type: "object",
+          fields: [
+            {
+              name: "asset",
+              type: "object",
+              fields: [
+                { name: "_type", type: "string" },
+                { name: "_ref", type: "string" },
+              ],
+            },
+            { name: "alt", type: "string" },
+          ],
         },
         {
           name: "youtube",
@@ -977,7 +1002,7 @@ async function convertBodyHtmlToPortableText(
     rules: customBlockRules,
   });
 
-  return removeWhitespaceOnlyPortableTextBlocks(
+  return normalizeImportedPortableText(
     blocks as unknown as PortableTextNode[]
   );
 }
@@ -1203,10 +1228,48 @@ function createImagePlaceholder(
   return placeholder;
 }
 
+function normalizeImportedPortableText(
+  blocks: PortableTextNode[]
+): PortableTextNode[] {
+  return normalizeLinkMarkDefs(removeWhitespaceOnlyPortableTextBlocks(blocks));
+}
+
 function removeWhitespaceOnlyPortableTextBlocks(
   blocks: PortableTextNode[]
 ): PortableTextNode[] {
   return blocks.filter((block) => !isWhitespaceOnlyPortableTextBlock(block));
+}
+
+function normalizeLinkMarkDefs(blocks: PortableTextNode[]): PortableTextNode[] {
+  return blocks.map((block) => {
+    if (block._type !== "block" || !Array.isArray(block.markDefs)) {
+      return block;
+    }
+
+    return {
+      ...block,
+      markDefs: block.markDefs.map((markDef) => {
+        if (!isRecord(markDef) || markDef._type !== "link") {
+          return markDef;
+        }
+
+        const href = typeof markDef.href === "string" ? markDef.href : undefined;
+
+        if (!href) {
+          return markDef;
+        }
+
+        return {
+          ...markDef,
+          isExternal: true,
+          target:
+            typeof markDef.target === "boolean"
+              ? markDef.target
+              : shouldOpenImportedLinkInNewTab(href),
+        };
+      }),
+    };
+  });
 }
 
 function isWhitespaceOnlyPortableTextBlock(block: PortableTextNode): boolean {
@@ -1225,6 +1288,10 @@ function isWhitespaceOnlyPortableTextBlock(block: PortableTextNode): boolean {
       child.text.trim().length === 0
     );
   });
+}
+
+function shouldOpenImportedLinkInNewTab(href: string): boolean {
+  return /^https?:\/\//u.test(href);
 }
 
 function extractBlogPostingJsonLd($: CheerioAPI): JsonObject | undefined {
