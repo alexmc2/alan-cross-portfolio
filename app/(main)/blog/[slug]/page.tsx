@@ -51,6 +51,34 @@ function formatDate(dateString: string) {
   });
 }
 
+function isWhitespaceOnlyBlock(block: any) {
+  if (block?._type !== "block" || !Array.isArray(block.children)) {
+    return false;
+  }
+
+  return !block.children.some((child: any) =>
+    typeof child?.text === "string" ? child.text.trim().length > 0 : false
+  );
+}
+
+function removeLeadingBodyImage(body: Post["body"], hasMainImage: boolean) {
+  if (!hasMainImage || !Array.isArray(body)) {
+    return body;
+  }
+
+  const normalizedBody = [...body];
+
+  while (normalizedBody[0] && isWhitespaceOnlyBlock(normalizedBody[0])) {
+    normalizedBody.shift();
+  }
+
+  if (normalizedBody[0]?._type === "image") {
+    normalizedBody.shift();
+  }
+
+  return normalizedBody;
+}
+
 export default async function PostPage(props: {
   params: Promise<{ slug: string }>;
 }) {
@@ -62,6 +90,8 @@ export default async function PostPage(props: {
   if (!post) {
     notFound();
   }
+
+  const body = removeLeadingBodyImage(post.body, Boolean(post.mainImage?.asset));
 
   return (
     <>
@@ -79,9 +109,9 @@ export default async function PostPage(props: {
           {/* Header */}
           <header className="mb-12">
             <div className="flex items-center gap-4 mb-4">
-              {post.category && (
+              {post.category?.title && (
                 <span className="text-[0.65rem] tracking-[0.2em] uppercase text-accent font-medium">
-                  {post.category}
+                  {post.category.title}
                 </span>
               )}
               <span className="text-[0.7rem] text-text-muted">
@@ -112,9 +142,9 @@ export default async function PostPage(props: {
           )}
 
           {/* Body */}
-          {post.body && (
+          {body && (
             <div className="text-text-secondary leading-[1.8] [&>p]:mb-6 [&>h1]:text-text-primary [&>h1]:font-display [&>h1]:mt-12 [&>h1]:mb-6 [&>h2]:text-text-primary [&>h2]:font-display [&>h2]:text-[1.8rem] [&>h2]:mt-10 [&>h2]:mb-4 [&>h3]:text-text-primary [&>h3]:font-display [&>h3]:text-[1.3rem] [&>h3]:mt-8 [&>h3]:mb-3 [&>h4]:text-text-primary [&>h4]:font-display [&>a]:text-accent [&>a]:underline [&>blockquote]:border-l-2 [&>blockquote]:border-accent [&>blockquote]:pl-6 [&>blockquote]:italic [&>blockquote]:text-text-secondary [&>blockquote]:my-8 [&>ul]:list-disc [&>ul]:pl-6 [&>ul]:mb-6 [&>ol]:list-decimal [&>ol]:pl-6 [&>ol]:mb-6">
-              <PortableTextRenderer value={post.body} />
+              <PortableTextRenderer value={body} />
             </div>
           )}
         </div>

@@ -70,6 +70,13 @@ export type Service = {
   order?: number;
 };
 
+export type Category = {
+  _id?: string;
+  _type?: 'category';
+  title: string;
+  slug?: { current: string } | null;
+};
+
 export type Post = {
   _id: string;
   _type: 'post';
@@ -78,7 +85,8 @@ export type Post = {
   publishedAt: string;
   excerpt?: string;
   mainImage?: SanityImage;
-  category?: string;
+  category?: Category | null;
+  categories?: Category[];
   body?: any[];
   meta_title?: string;
   meta_description?: string;

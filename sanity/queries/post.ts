@@ -6,7 +6,34 @@ export const POST_QUERY = groq`*[_type == "post" && slug.current == $slug][0]{
   title,
   slug,
   publishedAt,
-  category,
+  "category": select(
+    defined(category->_ref) => category->{
+      title,
+      slug
+    },
+    defined(category) => {
+      "title": category
+    },
+    null
+  ),
+  "categories": select(
+    defined(categories) => categories[]->{
+      title,
+      slug
+    },
+    defined(category) => [
+      select(
+        defined(category->_ref) => category->{
+          title,
+          slug
+        },
+        {
+          "title": category
+        }
+      )
+    ],
+    []
+  ),
   excerpt,
   mainImage{
     ${imageQuery}
@@ -35,7 +62,34 @@ export const POSTS_QUERY = groq`*[_type == "post" && defined(slug)] | order(publ
   title,
   slug,
   publishedAt,
-  category,
+  "category": select(
+    defined(category->_ref) => category->{
+      title,
+      slug
+    },
+    defined(category) => {
+      "title": category
+    },
+    null
+  ),
+  "categories": select(
+    defined(categories) => categories[]->{
+      title,
+      slug
+    },
+    defined(category) => [
+      select(
+        defined(category->_ref) => category->{
+          title,
+          slug
+        },
+        {
+          "title": category
+        }
+      )
+    ],
+    []
+  ),
   excerpt,
   mainImage{
     ${imageQuery}

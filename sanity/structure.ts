@@ -6,6 +6,7 @@ import {
   Files,
   FileText,
   Contact,
+  Tags,
 } from 'lucide-react';
 
 export const structure = (S: any) =>
@@ -50,9 +51,26 @@ export const structure = (S: any) =>
         .title('Blog')
         .icon(FileText)
         .child(
-          S.documentTypeList('post')
-            .title('Blog Posts')
-            .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }]),
+          S.list()
+            .title('Blog')
+            .items([
+              S.listItem()
+                .title('Blog Posts')
+                .icon(FileText)
+                .child(
+                  S.documentTypeList('post')
+                    .title('Blog Posts')
+                    .defaultOrdering([{ field: 'publishedAt', direction: 'desc' }]),
+                ),
+              S.listItem()
+                .title('Categories')
+                .icon(Tags)
+                .child(
+                  S.documentTypeList('category')
+                    .title('Categories')
+                    .defaultOrdering([{ field: 'title', direction: 'asc' }]),
+                ),
+            ]),
         ),
       S.listItem()
         .title('Contact Details')
