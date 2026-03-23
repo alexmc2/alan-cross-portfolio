@@ -10,7 +10,10 @@ export default function BackToTop() {
 
   useEffect(() => {
     const handleScroll = () => {
-      setIsVisible(window.scrollY > SHOW_AFTER_SCROLL_Y);
+      const nextVisible = window.scrollY > SHOW_AFTER_SCROLL_Y;
+      setIsVisible((current) =>
+        current === nextVisible ? current : nextVisible,
+      );
     };
 
     handleScroll();
@@ -26,6 +29,9 @@ export default function BackToTop() {
           <button
             type="button"
             aria-label="Back to top"
+            aria-hidden={!isVisible}
+            tabIndex={isVisible ? 0 : -1}
+            disabled={!isVisible}
             onClick={() => window.scrollTo({ top: 0, behavior: 'smooth' })}
             className={`fixed bottom-6 right-6 z-[90] flex h-10 w-10 items-center justify-center rounded-full border border-border bg-bg-card text-text-primary shadow-[0_12px_32px_rgba(0,0,0,0.22)] transition-opacity duration-300 hover:text-accent max-md:bottom-5 max-md:right-5 ${
               isVisible ? 'opacity-100' : 'pointer-events-none opacity-0'
