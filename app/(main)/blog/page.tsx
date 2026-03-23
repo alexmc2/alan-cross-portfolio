@@ -78,9 +78,9 @@ export default async function BlogPage() {
                       {/* Content */}
                       <div className="p-6 flex flex-col flex-1">
                         <div className="flex items-center gap-4 mb-3">
-                          {post.category && (
+                          {post.category?.title && (
                             <span className="text-[0.65rem] tracking-[0.2em] uppercase text-accent font-medium">
-                              {post.category}
+                              {post.category.title}
                             </span>
                           )}
                           <span className="text-[0.7rem] text-text-secondary">

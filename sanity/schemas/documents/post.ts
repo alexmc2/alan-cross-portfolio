@@ -59,18 +59,23 @@ export default defineType({
     }),
     defineField({
       name: "category",
-      title: "Category",
-      type: "string",
+      title: "Primary Category",
+      type: "reference",
       group: "settings",
-      options: {
-        list: [
-          { title: "Production", value: "Production" },
-          { title: "AI", value: "AI" },
-          { title: "Course", value: "Course" },
-          { title: "Behind the Scenes", value: "Behind the Scenes" },
-          { title: "General", value: "General" },
-        ],
-      },
+      to: [{ type: "category" }],
+    }),
+    defineField({
+      name: "categories",
+      title: "Categories",
+      type: "array",
+      group: "settings",
+      of: [
+        {
+          type: "reference",
+          to: [{ type: "category" }],
+        },
+      ],
+      validation: (Rule) => Rule.unique(),
     }),
     defineField({
       name: "body",
@@ -107,8 +112,23 @@ export default defineType({
   preview: {
     select: {
       title: "title",
-      subtitle: "category",
+      subtitle: "category.title",
+      categoryString: "category",
       media: "mainImage",
+    },
+    prepare(selection) {
+      const subtitle =
+        typeof selection.subtitle === "string"
+          ? selection.subtitle
+          : typeof selection.categoryString === "string"
+            ? selection.categoryString
+            : undefined;
+
+      return {
+        title: selection.title,
+        subtitle,
+        media: selection.media,
+      };
     },
   },
 });

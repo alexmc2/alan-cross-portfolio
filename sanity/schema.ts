@@ -7,6 +7,7 @@ import portfolioItem from './schemas/documents/portfolioItem';
 import service from './schemas/documents/service';
 import page from './schemas/documents/page';
 import post from './schemas/documents/post';
+import category from './schemas/documents/category';
 import socialLink from './schemas/documents/socialLink';
 import contactDetail from './schemas/documents/contactDetail';
 
@@ -21,6 +22,7 @@ export const schema: { types: SchemaTypeDefinition[] } = {
     service,
     page,
     post,
+    category,
     socialLink,
     contactDetail,
     // shared objects

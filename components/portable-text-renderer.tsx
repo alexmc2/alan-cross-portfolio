@@ -7,6 +7,29 @@ import { Highlight, themes } from "prism-react-renderer";
 import { CopyButton } from "@/components/ui/copy-button";
 
 type PortableTextSpacing = "default" | "none";
+type PortableTextValue = PortableTextProps["value"];
+
+function isWhitespaceOnlyPortableTextBlock(block: any) {
+  if (block?._type !== "block" || !Array.isArray(block.children)) {
+    return false;
+  }
+
+  return block.children.every((child: any) => {
+    if (child?._type !== "span" || typeof child?.text !== "string") {
+      return false;
+    }
+
+    return child.text.trim().length === 0;
+  });
+}
+
+function normalizePortableTextValue(value: PortableTextValue): PortableTextValue {
+  if (!Array.isArray(value)) {
+    return value;
+  }
+
+  return value.filter((block) => !isWhitespaceOnlyPortableTextBlock(block));
+}
 
 const getSpacingValue = (spacing: PortableTextSpacing) =>
   spacing === "none" ? "0" : "1rem";
@@ -187,7 +210,7 @@ export default function PortableTextRenderer({
 }) {
   return (
     <PortableText
-      value={value}
+      value={normalizePortableTextValue(value)}
       components={createPortableTextComponents(spacing)}
     />
   );
