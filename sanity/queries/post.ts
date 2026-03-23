@@ -7,7 +7,7 @@ export const POST_QUERY = groq`*[_type == "post" && slug.current == $slug][0]{
   slug,
   publishedAt,
   "category": select(
-    defined(category->_ref) => category->{
+    defined(category._ref) => category->{
       title,
       slug
     },
@@ -23,7 +23,7 @@ export const POST_QUERY = groq`*[_type == "post" && slug.current == $slug][0]{
     },
     defined(category) => [
       select(
-        defined(category->_ref) => category->{
+        defined(category._ref) => category->{
           title,
           slug
         },
@@ -63,7 +63,7 @@ export const POSTS_QUERY = groq`*[_type == "post" && defined(slug)] | order(publ
   slug,
   publishedAt,
   "category": select(
-    defined(category->_ref) => category->{
+    defined(category._ref) => category->{
       title,
       slug
     },
@@ -79,7 +79,7 @@ export const POSTS_QUERY = groq`*[_type == "post" && defined(slug)] | order(publ
     },
     defined(category) => [
       select(
-        defined(category->_ref) => category->{
+        defined(category._ref) => category->{
           title,
           slug
         },

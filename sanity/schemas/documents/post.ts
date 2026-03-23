@@ -113,7 +113,22 @@ export default defineType({
     select: {
       title: "title",
       subtitle: "category.title",
+      categoryString: "category",
       media: "mainImage",
+    },
+    prepare(selection) {
+      const subtitle =
+        typeof selection.subtitle === "string"
+          ? selection.subtitle
+          : typeof selection.categoryString === "string"
+            ? selection.categoryString
+            : undefined;
+
+      return {
+        title: selection.title,
+        subtitle,
+        media: selection.media,
+      };
     },
   },
 });
