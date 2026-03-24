@@ -1,4 +1,4 @@
-import { fetchSanityPosts } from '@/sanity/lib/fetch';
+import { fetchSanityPosts, fetchSiteSettingsMetadata } from '@/sanity/lib/fetch';
 import { urlFor } from '@/sanity/lib/image';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -7,12 +7,19 @@ import SiteFooter from '@/components/sections/site-footer';
 import BlogCategoryFilter from './category-filter';
 import type { Metadata } from 'next';
 import type { Post } from '@/types';
+import { buildMetadata } from '@/lib/metadata';
 
-export const metadata: Metadata = {
-  title: 'Blog',
-  description:
-    'Thoughts on filmmaking, AI video production, and creative technology.',
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const siteSettings = await fetchSiteSettingsMetadata();
+
+  return buildMetadata({
+    title: 'Blog',
+    description:
+      'Thoughts on filmmaking, AI video production, and creative technology.',
+    canonicalPath: '/blog',
+    image: siteSettings?.ogImage,
+  });
+}
 
 const POSTS_PER_PAGE = 6;
 

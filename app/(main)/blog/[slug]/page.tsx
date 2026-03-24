@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import {
+  fetchSiteSettingsMetadata,
   fetchSanityPostBySlug,
   fetchSanityPostsStaticParams,
 } from "@/sanity/lib/fetch";
@@ -13,6 +14,7 @@ import { siteUrl } from "@/lib/siteConfig";
 import ShareActions from "./share-actions";
 import type { Metadata } from "next";
 import type { Post } from "@/types";
+import { buildMetadata, resolveSiteDescription } from "@/lib/metadata";
 
 export async function generateStaticParams() {
   const posts = await fetchSanityPostsStaticParams();
@@ -25,59 +27,49 @@ export async function generateMetadata(props: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
   const params = await props.params;
-  const post = (await fetchSanityPostBySlug({
-    slug: params.slug,
-  })) as Post | null;
+  const [post, siteSettings] = await Promise.all([
+    fetchSanityPostBySlug({
+      slug: params.slug,
+    }),
+    fetchSiteSettingsMetadata(),
+  ]);
 
   if (!post) return {};
 
-  const canonicalUrl = `${siteUrl}/blog/${params.slug}`;
   const socialTitle = post.meta_title || post.title;
-  const socialDescription = post.meta_description || post.excerpt;
-  const socialImageUrl =
-    post.ogImage?.asset?.url ??
-    (post.mainImage?.asset
-      ? urlFor(post.mainImage).width(1200).height(630).format("jpg").url()
-      : undefined);
-  const socialImageWidth =
-    post.ogImage?.asset?.metadata?.dimensions?.width ?? 1200;
-  const socialImageHeight =
-    post.ogImage?.asset?.metadata?.dimensions?.height ?? 630;
+  const socialDescription =
+    post.meta_description ||
+    post.excerpt ||
+    resolveSiteDescription(siteSettings);
+  const generatedMainImage = post.mainImage?.asset
+    ? {
+        asset: {
+          url: urlFor(post.mainImage)
+            .width(1200)
+            .height(630)
+            .format("jpg")
+            .url(),
+          metadata: {
+            dimensions: {
+              width: 1200,
+              height: 630,
+            },
+          },
+        },
+      }
+    : null;
 
-  return {
+  return buildMetadata({
     title: socialTitle,
     description: socialDescription,
-    alternates: {
-      canonical: canonicalUrl,
-    },
-    openGraph: {
-      title: socialTitle,
-      description: socialDescription,
-      type: "article",
-      url: canonicalUrl,
-      siteName: "Alan Cross",
-      publishedTime: post.publishedAt,
-      ...(socialImageUrl && {
-        images: [
-          {
-            url: socialImageUrl,
-            width: socialImageWidth,
-            height: socialImageHeight,
-            alt: post.title,
-          },
-        ],
-      }),
-    },
-    twitter: {
-      card: socialImageUrl ? "summary_large_image" : "summary",
-      title: socialTitle,
-      description: socialDescription,
-      ...(socialImageUrl && {
-        images: [socialImageUrl],
-      }),
-    },
-    robots: post.noindex ? "noindex, nofollow" : undefined,
-  };
+    canonicalPath: `/blog/${params.slug}`,
+    image: post.ogImage?.asset?.url
+      ? post.ogImage
+      : generatedMainImage || siteSettings?.ogImage,
+    noindex: post.noindex,
+    type: "article",
+    publishedTime: post.publishedAt,
+  });
 }
 
 function formatDate(dateString: string) {

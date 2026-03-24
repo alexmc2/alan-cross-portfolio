@@ -3,15 +3,42 @@
 
 import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
-import { SETTINGS_QUERYResult } from "@/sanity.types";
 import { useTheme } from "next-themes";
 import { useMemo, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 
 type LogoVariant = "header" | "footer";
 
+type LogoAsset = {
+  asset?: {
+    metadata?: {
+      lqip?: string;
+      dimensions?: {
+        width?: number;
+        height?: number;
+      };
+    };
+    mimeType?: string;
+  };
+};
+
+type LogoGroup = {
+  light?: LogoAsset;
+  dark?: LogoAsset;
+  width?: number;
+  height?: number;
+};
+
+type LogoSettings = {
+  headerLogo?: LogoGroup;
+  footerLogo?: LogoGroup;
+  showSiteNameInHeader?: boolean;
+  showSiteNameInFooter?: boolean;
+  siteName?: string;
+};
+
 type LogoProps = {
-  settings: SETTINGS_QUERYResult;
+  settings: LogoSettings;
   variant?: LogoVariant;
   className?: string;
   sizes?: string;

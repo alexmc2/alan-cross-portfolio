@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import {
+  fetchSiteSettingsMetadata,
   fetchSanityPageBySlug,
   fetchSanityPagesStaticParams,
 } from "@/sanity/lib/fetch";
@@ -8,6 +9,7 @@ import SiteFooter from "@/components/sections/site-footer";
 import PortableTextRenderer from "@/components/portable-text-renderer";
 import type { Metadata } from "next";
 import type { Page } from "@/types";
+import { buildMetadata, resolveSiteDescription } from "@/lib/metadata";
 
 const RESERVED_SLUGS = new Set(["index", "blog", "studio", "api"]);
 
@@ -29,24 +31,22 @@ export async function generateMetadata(props: {
     return {};
   }
 
-  const page = (await fetchSanityPageBySlug({
-    slug: params.slug,
-  })) as Page | null;
+  const [page, siteSettings] = await Promise.all([
+    fetchSanityPageBySlug({
+      slug: params.slug,
+    }),
+    fetchSiteSettingsMetadata(),
+  ]);
 
   if (!page) return {};
 
-  return {
+  return buildMetadata({
     title: page.meta_title || page.title,
-    description: page.meta_description,
-    openGraph: {
-      title: page.meta_title || page.title,
-      description: page.meta_description,
-      ...(page.ogImage?.asset?.url && {
-        images: [{ url: page.ogImage.asset.url }],
-      }),
-    },
-    robots: page.noindex ? "noindex, nofollow" : undefined,
-  };
+    description: page.meta_description || resolveSiteDescription(siteSettings),
+    canonicalPath: `/${params.slug}`,
+    image: page.ogImage?.asset?.url ? page.ogImage : siteSettings?.ogImage,
+    noindex: page.noindex,
+  });
 }
 
 export default async function GenericPage(props: {

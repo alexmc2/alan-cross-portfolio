@@ -11,6 +11,43 @@ const MOBILE_VISIBLE_ITEMS = 4;
 const STAGGER_MS = 120;
 const WORK_ENTRY_THRESHOLD = 0.03;
 const WORK_ENTRY_ROOT_MARGIN = '0px';
+const DEFAULT_MEDIA_ASPECT_RATIO = '16 / 9';
+
+const PORTFOLIO_ASPECT_RATIO_VALUES: Record<
+  NonNullable<PortfolioItem['aspectRatio']>,
+  string | null
+> = {
+  auto: null,
+  '16:9': '16 / 9',
+  '4:3': '4 / 3',
+  '1:1': '1 / 1',
+  '9:16': '9 / 16',
+  '21:9': '21 / 9',
+};
+
+function getMediaAspectRatio(item: PortfolioItem): string {
+  const configuredAspectRatio = item.aspectRatio
+    ? PORTFOLIO_ASPECT_RATIO_VALUES[item.aspectRatio]
+    : null;
+
+  if (configuredAspectRatio) {
+    return configuredAspectRatio;
+  }
+
+  const dimensions = item.thumbnail?.asset?.metadata?.dimensions;
+
+  if (dimensions?.width && dimensions?.height) {
+    return `${dimensions.width} / ${dimensions.height}`;
+  }
+
+  return DEFAULT_MEDIA_ASPECT_RATIO;
+}
+
+function getDisplayMode(
+  displayMode?: PortfolioItem['displayMode'],
+): 'contain' | 'cover' {
+  return displayMode === 'cover' ? 'cover' : 'contain';
+}
 
 export default function Work({ items }: { items: PortfolioItem[] }) {
   const [visibleCount, setVisibleCount] = useState(MOBILE_VISIBLE_ITEMS);
@@ -93,8 +130,16 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
             const mediaMimeType = uploadedVideoUrl
               ? uploadedVideoMimeType
               : externalMedia?.mimeType;
+            const aspectRatio = getMediaAspectRatio(item);
+            const displayMode = getDisplayMode(item.displayMode);
+            const mediaFitClass =
+              displayMode === 'cover' ? 'object-cover' : 'object-contain';
+            const containInsetClass =
+              displayMode === 'contain'
+                ? '-inset-px w-[calc(100%+2px)] h-[calc(100%+2px)]'
+                : 'inset-0 w-full h-full';
             const thumbnailUrl = item.thumbnail?.asset
-              ? urlFor(item.thumbnail).width(1200).height(675).url()
+              ? urlFor(item.thumbnail).width(1200).url()
               : null;
             const posterSrc = thumbnailUrl ?? externalMedia?.posterSrc ?? null;
             const destinationHref = uploadedVideoUrl || videoUrl || null;
@@ -107,8 +152,10 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                   isHiddenOnMobile ? 'hidden' : ''
                 }`}
               >
-                {/* Video / Thumbnail — 16:9 */}
-                <div className="group relative aspect-video rounded overflow-hidden bg-bg-card">
+                <div
+                  className="group relative w-full rounded overflow-hidden bg-bg-card"
+                  style={{ aspectRatio }}
+                >
                   {mediaSrc ? (
                     <DeferredMediaFrame
                       mediaType={mediaType}
@@ -116,24 +163,27 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                       mimeType={mediaMimeType}
                       title={item.title}
                       fallbackLabel={item.category || 'Video'}
-                      sizes="(max-width: 900px) 100vw, 1100px"
+                      sizes="(max-width: 900px) 100vw, 1200px"
                       posterSrc={posterSrc ?? undefined}
                       posterBlurDataURL={item.thumbnail?.asset?.metadata?.lqip}
+                      displayMode={displayMode}
                     />
                   ) : thumbnailUrl ? (
-                    <Image
-                      src={thumbnailUrl}
-                      alt={item.title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 900px) 100vw, 1100px"
-                      placeholder={
-                        item.thumbnail?.asset?.metadata?.lqip
-                          ? 'blur'
-                          : undefined
-                      }
-                      blurDataURL={item.thumbnail?.asset?.metadata?.lqip}
-                    />
+                    <div className={`absolute ${containInsetClass}`}>
+                      <Image
+                        src={thumbnailUrl}
+                        alt={item.title}
+                        fill
+                        className={mediaFitClass}
+                        sizes="(max-width: 900px) 100vw, 1200px"
+                        placeholder={
+                          item.thumbnail?.asset?.metadata?.lqip
+                            ? 'blur'
+                            : undefined
+                        }
+                        blurDataURL={item.thumbnail?.asset?.metadata?.lqip}
+                      />
+                    </div>
                   ) : (
                     <div
                       className="w-full h-full flex items-center justify-center"
@@ -179,7 +229,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                 </div>
 
                 {/* Meta row: pill | title | divider | index */}
-                <div className="flex items-center gap-4 mt-5 px-1 max-[900px]:flex-wrap max-[900px]:gap-2.5">
+                <div className="mt-5 flex items-center gap-4 px-1 max-[900px]:justify-between max-[900px]:gap-3">
                   {item.category && (
                     <span
                       className="inline-block shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-[11px] font-medium tracking-[2px] uppercase text-accent"

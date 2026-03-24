@@ -59,6 +59,8 @@ export type PortfolioItem = {
   thumbnail?: SanityImage;
   description?: string;
   year?: string;
+  aspectRatio?: 'auto' | '16:9' | '4:3' | '1:1' | '9:16' | '21:9';
+  displayMode?: 'contain' | 'cover';
   featured?: boolean;
   order?: number;
 };
