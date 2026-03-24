@@ -17,9 +17,9 @@ export const metadata: Metadata = {
 const POSTS_PER_PAGE = 6;
 
 function formatDate(dateString: string) {
-  return new Date(dateString).toLocaleDateString('en-GB', {
+  return new Date(dateString).toLocaleDateString('en-US', {
     day: 'numeric',
-    month: 'long',
+    month: 'short',
     year: 'numeric',
   });
 }
@@ -106,15 +106,20 @@ export default async function BlogPage({
       <Nav />
       <section className="pt-40 pb-28 px-12 max-md:pt-32 max-md:pb-20 max-md:px-6">
         <div className="max-w-[1200px] mx-auto">
-          <div className="slabel">Blog</div>
-          <h1 className="font-display text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[1.1] mb-10">
-            Latest Posts
-          </h1>
+          <div className="mb-10 opacity-0 animate-fade-up">
+            <div className="slabel">Blog</div>
+            <h1 className="font-display text-[clamp(2rem,4vw,3.5rem)] font-bold leading-[1.1]">
+              Latest Posts
+            </h1>
+          </div>
 
           {/* Category filters */}
           {categories.length > 0 && (
             <>
-              <div className="flex gap-3 mb-12 overflow-x-auto pb-2 md:hidden">
+              <div
+                className="flex gap-3 mb-12 overflow-x-auto pb-2 md:hidden opacity-0 animate-fade-up"
+                style={{ animationDelay: '120ms' }}
+              >
                 <Link
                   href="/blog"
                   className={`shrink-0 text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 border transition-colors duration-300 no-underline whitespace-nowrap ${
@@ -150,7 +155,10 @@ export default async function BlogPage({
           )}
 
           {totalPages > 1 && (
-            <div className="flex justify-end mb-6">
+            <div
+              className="flex justify-end mb-6 opacity-0 animate-fade-up"
+              style={{ animationDelay: '200ms' }}
+            >
               <span className="text-[0.75rem] tracking-[0.12em] uppercase text-text-secondary whitespace-nowrap">
                 Page {safePage} of {totalPages}
               </span>
@@ -158,11 +166,22 @@ export default async function BlogPage({
           )}
 
           {paginatedPosts.length === 0 ? (
-            <p className="text-text-secondary">No posts found.</p>
+            <p
+              className="text-text-secondary opacity-0 animate-fade-up"
+              style={{ animationDelay: '240ms' }}
+            >
+              No posts found.
+            </p>
           ) : (
             <div className="grid grid-cols-2 gap-8 max-[900px]:grid-cols-1">
-              {paginatedPosts.map((post) => (
-                <div key={post.slug.current} className="flex">
+              {paginatedPosts.map((post, index) => (
+                <div
+                  key={post.slug.current}
+                  className="flex opacity-0 animate-fade-up"
+                  style={{
+                    animationDelay: `${240 + index * 90}ms`,
+                  }}
+                >
                   <Link
                     href={`/blog/${post.slug.current}`}
                     className="group no-underline flex flex-1"
@@ -229,7 +248,13 @@ export default async function BlogPage({
           {totalPages > 1 && (
             <nav
               aria-label="Blog pagination"
-              className="flex items-center justify-center gap-1.5 mt-16"
+              className="flex items-center justify-center gap-1.5 mt-16 opacity-0 animate-fade-up"
+              style={{
+                animationDelay: `${Math.min(
+                  320 + paginatedPosts.length * 90,
+                  860
+                )}ms`,
+              }}
             >
               {/* Previous */}
               {safePage > 1 ? (

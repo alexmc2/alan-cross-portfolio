@@ -32,7 +32,10 @@ export default function BlogCategoryFilter({
   }, [initiallyOpen]);
 
   return (
-    <div className="hidden md:block mb-12">
+    <div
+      className="hidden md:block mb-12 opacity-0 animate-fade-up"
+      style={{ animationDelay: '120ms' }}
+    >
       <div className="flex flex-wrap gap-3">
         <Link
           href="/blog"
@@ -71,7 +74,7 @@ export default function BlogCategoryFilter({
                 : 'border-accent/30 text-text-secondary hover:border-accent hover:text-accent'
             }`}
           >
-            More
+            {isOpen ? 'Less' : 'More'}
           </button>
         )}
       </div>

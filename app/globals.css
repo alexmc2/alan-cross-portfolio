@@ -47,9 +47,9 @@
   --color-border: rgba(16, 23, 38, 0.08);
 
   /* Scrollbar */
-  --color-scrollbar-track: #fafafa;
-  --color-scrollbar-thumb: #cbd5e1;
-  --color-scrollbar-thumb-hover: #94a3b8;
+  --color-scrollbar-track: #0a0a0a;
+  --color-scrollbar-thumb: #333;
+  --color-scrollbar-thumb-hover: #444;
 
   /* Surfaces — frosted light nav and floating panels */
   --color-nav-surface: rgba(250, 250, 250, 0.92);
@@ -187,7 +187,7 @@
 
 /* Section label pattern */
 .slabel {
-  font-size: 0.65rem;
+  font-size: 1rem;
   font-weight: 500;
   letter-spacing: 0.3em;
   text-transform: uppercase;
@@ -204,6 +204,12 @@
   width: 1.5rem;
   height: 1px;
   background: var(--color-accent);
+}
+
+@media (max-width: 768px) {
+  .slabel {
+    font-size: 0.8rem;
+  }
 }
 
 /* Scrollbar */
