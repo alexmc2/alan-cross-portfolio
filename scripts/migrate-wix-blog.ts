@@ -17,6 +17,7 @@ const WIX_BLOG_URL = "https://www.alanx.uk/blog-1";
 const WIX_FEED_URL = "https://www.alanx.uk/blog-feed.xml";
 const WIX_POST_SITEMAP_URL = "https://www.alanx.uk/blog-posts-sitemap.xml";
 const REQUEST_DELAY_MS = 1_000;
+const MAX_FETCH_ATTEMPTS = 3;
 const API_VERSION = "2024-10-31";
 const DRY_RUN = process.argv.includes("--dry-run");
 const UPDATE_EXISTING = process.argv.includes("--update-existing");
@@ -185,6 +186,7 @@ type PortableTextNode = Record<string, unknown>;
 type SanityReference = {
   _type: "reference";
   _ref: string;
+  _key?: string;
 };
 
 type SanityImageField = {
@@ -743,6 +745,7 @@ async function ensureCategoryAssignments(
     );
 
     categoryRefs.push({
+      _key: randomKey(12),
       _type: "reference",
       _ref: categoryDocument._id,
     });
@@ -1460,9 +1463,17 @@ function buildExcerpt(text: string): string {
 
 function extractSlugFromPostUrl(url: string): string | undefined {
   try {
-    const pathname = new URL(url).pathname;
-    const match = pathname.match(/^\/post\/([^/]+)\/?$/u);
-    return match?.[1];
+    const pathnameSegments = new URL(url).pathname
+      .split("/")
+      .filter(Boolean);
+    const postIndex = pathnameSegments.indexOf("post");
+
+    if (postIndex === -1) {
+      return undefined;
+    }
+
+    const slug = pathnameSegments.at(-1);
+    return slug ? decodeURIComponent(slug) : undefined;
   } catch {
     return undefined;
   }
@@ -1734,6 +1745,48 @@ class RateLimitedFetcher {
   constructor(private readonly delayMs: number) {}
 
   async fetch(url: string, init?: RequestInit): Promise<Response> {
+    let lastError: Error | undefined;
+
+    for (let attempt = 1; attempt <= MAX_FETCH_ATTEMPTS; attempt += 1) {
+      try {
+        await this.waitForTurn();
+
+        const response = await fetch(url, {
+          redirect: "follow",
+          ...init,
+          headers: {
+            "user-agent": "alan-cross-wix-migration/1.0 (+https://www.alanx.uk)",
+            accept:
+              "text/html,application/xml,application/xhtml+xml,image/avif,image/webp,*/*;q=0.8",
+            ...(init?.headers ?? {}),
+          },
+        });
+
+        if (
+          attempt < MAX_FETCH_ATTEMPTS &&
+          (response.status === 429 || response.status >= 500)
+        ) {
+          await sleep(this.delayMs * (attempt + 1));
+          continue;
+        }
+
+        return response;
+      } catch (error) {
+        lastError =
+          error instanceof Error ? error : new Error(String(error));
+
+        if (attempt === MAX_FETCH_ATTEMPTS) {
+          throw lastError;
+        }
+
+        await sleep(this.delayMs * (attempt + 1));
+      }
+    }
+
+    throw lastError ?? new Error(`Failed to fetch ${url}`);
+  }
+
+  private async waitForTurn(): Promise<void> {
     const waitFor = this.delayMs - (Date.now() - this.lastRequestAt);
 
     if (this.lastRequestAt > 0 && waitFor > 0) {
@@ -1741,17 +1794,6 @@ class RateLimitedFetcher {
     }
 
     this.lastRequestAt = Date.now();
-
-    return fetch(url, {
-      redirect: "follow",
-      ...init,
-      headers: {
-        "user-agent": "alan-cross-wix-migration/1.0 (+https://www.alanx.uk)",
-        accept:
-          "text/html,application/xml,application/xhtml+xml,image/avif,image/webp,*/*;q=0.8",
-        ...(init?.headers ?? {}),
-      },
-    });
   }
 }
 
