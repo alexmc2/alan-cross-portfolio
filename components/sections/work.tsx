@@ -9,6 +9,8 @@ import DeferredMediaFrame from './deferred-media-frame';
 
 const MOBILE_VISIBLE_ITEMS = 4;
 const STAGGER_MS = 120;
+const WORK_ENTRY_THRESHOLD = 0.03;
+const WORK_ENTRY_ROOT_MARGIN = '0px';
 
 export default function Work({ items }: { items: PortfolioItem[] }) {
   const [visibleCount, setVisibleCount] = useState(MOBILE_VISIBLE_ITEMS);
@@ -56,7 +58,10 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
           observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+      {
+        threshold: WORK_ENTRY_THRESHOLD,
+        rootMargin: WORK_ENTRY_ROOT_MARGIN,
+      },
     );
 
     els.forEach((el) => observer.observe(el));
