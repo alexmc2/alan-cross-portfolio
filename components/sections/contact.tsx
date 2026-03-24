@@ -48,11 +48,11 @@ export default function Contact({
         {/* Left column */}
         <div className="reveal">
           <div className="slabel">Get in Touch</div>
-          {settings.contactHeading && (
+          {/* {settings.contactHeading && (
             <h2 className="font-display text-[clamp(2rem,3.5vw,3.2rem)] font-bold leading-[1.15] mb-6">
               {settings.contactHeading}
             </h2>
-          )}
+          )} */}
           {settings.contactSubheading && (
             <p className="text-text-secondary text-base max-w-[420px] mb-8">
               {settings.contactSubheading}

@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Portfolio Layout Options — Alan X</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&family=Syncopate:wght@400;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0a0a0a;
+    --bg-card: #111111;
+    --text: #e8e4df;
+    --text-muted: #8a8580;
+    --accent: #c9a96e;
+    --accent-dim: rgba(201,169,110,0.15);
+    --border: rgba(255,255,255,0.06);
+    --font-display: 'Syncopate', sans-serif;
+    --font-body: 'Poppins', sans-serif;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    overflow-x: hidden;
+  }
+
+  /* ── Layout Switcher ── */
+  .switcher {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: rgba(10,10,10,0.92);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--border);
+    padding: 16px 32px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .switcher-label {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-right: 8px;
+  }
+  .switcher button {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 500;
+    padding: 8px 20px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: transparent;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.3s ease;
+  }
+  .switcher button:hover {
+    border-color: var(--accent);
+    color: var(--text);
+  }
+  .switcher button.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: var(--bg);
+  }
+
+  /* ── Section wrapper ── */
+  .layout-section {
+    display: none;
+    padding: 100px 0 80px;
+    min-height: 100vh;
+  }
+  .layout-section.active { display: block; }
+
+  .section-header {
+    text-align: center;
+    padding: 40px 32px 60px;
+  }
+  .section-header h2 {
+    font-family: var(--font-display);
+    font-size: clamp(20px, 3vw, 32px);
+    letter-spacing: 6px;
+    text-transform: uppercase;
+    color: var(--text);
+    margin-bottom: 12px;
+  }
+  .section-header p {
+    color: var(--text-muted);
+    font-size: 14px;
+    font-weight: 300;
+    max-width: 600px;
+    margin: 0 auto;
+    line-height: 1.7;
+  }
+
+  /* ── Shared video placeholder ── */
+  .video-placeholder {
+    position: relative;
+    overflow: hidden;
+    background: #1a1a1a;
+  }
+  .video-placeholder img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.7s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  }
+  .video-placeholder:hover img {
+    transform: scale(1.04);
+  }
+  .play-btn {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.9);
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    background: rgba(201,169,110,0.9);
+    backdrop-filter: blur(10px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    opacity: 0;
+    transition: all 0.4s ease;
+    pointer-events: none;
+  }
+  .play-btn::after {
+    content: '';
+    display: block;
+    width: 0;
+    height: 0;
+    border-style: solid;
+    border-width: 10px 0 10px 18px;
+    border-color: transparent transparent transparent var(--bg);
+    margin-left: 3px;
+  }
+  .video-placeholder:hover .play-btn {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+
+  /* Video label overlay */
+  .video-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 40px 28px 24px;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 100%);
+    transition: opacity 0.4s ease;
+  }
+  .video-label h3 {
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 4px;
+  }
+  .video-label span {
+    font-size: 12px;
+    font-weight: 400;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* ═══════════════════════════════════════════
+     LAYOUT A — Staggered Cinematic Scroll
+     Each video is full-width but alternates
+     alignment with text overlays
+  ═══════════════════════════════════════════ */
+  .layout-a .video-row {
+    position: relative;
+    margin-bottom: 4px;
+    opacity: 0;
+    transform: translateX(-60px);
+    transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .layout-a .video-row.from-right {
+    transform: translateX(60px);
+  }
+  .layout-a .video-row.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .layout-a .video-placeholder {
+    width: 100%;
+    aspect-ratio: 21/9;
+  }
+  .layout-a .video-row .side-label {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    padding: 24px;
+  }
+  .layout-a .video-row:nth-child(odd) .side-label { left: 40px; }
+  .layout-a .video-row:nth-child(even) .side-label { right: 40px; text-align: right; }
+  .layout-a .side-label .num {
+    font-family: var(--font-display);
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 8px;
+  }
+  .layout-a .side-label h3 {
+    font-family: var(--font-body);
+    font-size: clamp(18px, 2.5vw, 28px);
+    font-weight: 600;
+    color: #fff;
+    margin-bottom: 6px;
+    text-shadow: 0 2px 20px rgba(0,0,0,0.6);
+  }
+  .layout-a .side-label span {
+    font-size: 13px;
+    color: var(--text-muted);
+    font-weight: 300;
+  }
+
+  /* ═══════════════════════════════════════════
+     LAYOUT B — Asymmetric Masonry
+     One large featured, rest smaller, offset
+  ═══════════════════════════════════════════ */
+  .layout-b .masonry {
+    max-width: 1280px;
+    margin: 0 auto;
+    padding: 0 24px;
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: 8px;
+  }
+  .layout-b .m-item {
+    opacity: 0;
+    transform: translateY(40px);
+    transition: all 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .layout-b .m-item.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .layout-b .m-item:nth-child(1) {
+    grid-column: 1 / 8;
+    transition-delay: 0s;
+  }
+  .layout-b .m-item:nth-child(1) .video-placeholder { aspect-ratio: 16/10; }
+
+  .layout-b .m-item:nth-child(2) {
+    grid-column: 8 / 13;
+    transition-delay: 0.1s;
+  }
+  .layout-b .m-item:nth-child(2) .video-placeholder { aspect-ratio: 1/1; }
+
+  .layout-b .m-item:nth-child(3) {
+    grid-column: 1 / 5;
+    transition-delay: 0.15s;
+  }
+  .layout-b .m-item:nth-child(3) .video-placeholder { aspect-ratio: 4/5; }
+
+  .layout-b .m-item:nth-child(4) {
+    grid-column: 5 / 13;
+    transition-delay: 0.2s;
+  }
+  .layout-b .m-item:nth-child(4) .video-placeholder { aspect-ratio: 21/9; }
+
+  .layout-b .m-item:nth-child(5) {
+    grid-column: 1 / 7;
+    transition-delay: 0.25s;
+  }
+  .layout-b .m-item:nth-child(5) .video-placeholder { aspect-ratio: 16/9; }
+
+  .layout-b .m-item:nth-child(6) {
+    grid-column: 7 / 13;
+    transition-delay: 0.3s;
+  }
+  .layout-b .m-item:nth-child(6) .video-placeholder { aspect-ratio: 16/9; }
+
+  .layout-b .m-item:nth-child(7) {
+    grid-column: 1 / 13;
+    transition-delay: 0.35s;
+  }
+  .layout-b .m-item:nth-child(7) .video-placeholder { aspect-ratio: 21/9; }
+
+  /* ═══════════════════════════════════════════
+     LAYOUT C — Single Column Focus
+     One video at a time, large, with animated
+     category pill and description
+  ═══════════════════════════════════════════ */
+  .layout-c .focus-list {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 24px;
+  }
+  .layout-c .focus-item {
+    margin-bottom: 80px;
+    opacity: 0;
+    transition: all 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .layout-c .focus-item.from-left {
+    transform: translateX(-80px);
+  }
+  .layout-c .focus-item.from-right {
+    transform: translateX(80px);
+  }
+  .layout-c .focus-item.visible {
+    opacity: 1;
+    transform: translateX(0);
+  }
+  .layout-c .focus-item .video-placeholder {
+    aspect-ratio: 16/9;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+  .layout-c .focus-meta {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-top: 20px;
+    padding: 0 4px;
+  }
+  .layout-c .focus-meta .pill {
+    display: inline-block;
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--accent);
+    border: 1px solid var(--accent-dim);
+    padding: 6px 16px;
+    border-radius: 100px;
+    background: var(--accent-dim);
+  }
+  .layout-c .focus-meta h3 {
+    font-size: 20px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .layout-c .focus-meta .divider {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+  .layout-c .focus-meta .idx {
+    font-family: var(--font-display);
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--text-muted);
+  }
+
+  /* ═══════════════════════════════════════════
+     LAYOUT D — Horizontal Scroll Reel
+     Mimics a film strip / editing timeline
+  ═══════════════════════════════════════════ */
+  .layout-d .reel-wrapper {
+    position: relative;
+    overflow: hidden;
+    padding: 0 0 60px;
+  }
+  .layout-d .reel-track {
+    display: flex;
+    gap: 20px;
+    padding: 0 max(24px, calc((100vw - 1200px) / 2));
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .layout-d .reel-track::-webkit-scrollbar { display: none; }
+
+  .layout-d .reel-item {
+    flex: 0 0 min(70vw, 800px);
+    scroll-snap-align: center;
+    opacity: 0;
+    transform: scale(0.92);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .layout-d .reel-item.visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  .layout-d .reel-item .video-placeholder {
+    aspect-ratio: 16/9;
+    border-radius: 6px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+  }
+  .layout-d .reel-item .reel-info {
+    margin-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .layout-d .reel-item .reel-info h3 {
+    font-size: 17px;
+    font-weight: 500;
+    color: var(--text);
+  }
+  .layout-d .reel-item .reel-info span {
+    font-size: 12px;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+  }
+
+  /* Scroll hint line */
+  .layout-d .scroll-line {
+    max-width: 1200px;
+    margin: 24px auto 0;
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .layout-d .scroll-line .track {
+    flex: 1;
+    height: 2px;
+    background: var(--border);
+    border-radius: 2px;
+    position: relative;
+  }
+  .layout-d .scroll-line .thumb {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 20%;
+    height: 100%;
+    background: var(--accent);
+    border-radius: 2px;
+    transition: left 0.15s ease;
+  }
+  .layout-d .scroll-line span {
+    font-size: 11px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-muted);
+    white-space: nowrap;
+  }
+
+  /* ── Placeholder images (gradient based) ── */
+  .ph-1 { background: linear-gradient(135deg, #1a2a2a, #2a1a1a); }
+  .ph-2 { background: linear-gradient(135deg, #1a1a2a, #2a2a1a); }
+  .ph-3 { background: linear-gradient(135deg, #2a1a2a, #1a2a1a); }
+  .ph-4 { background: linear-gradient(135deg, #1a2a1a, #1a1a2a); }
+  .ph-5 { background: linear-gradient(135deg, #2a2a1a, #1a2a2a); }
+  .ph-6 { background: linear-gradient(135deg, #1a1a1a, #2a2a2a); }
+  .ph-7 { background: linear-gradient(135deg, #2a1a1a, #1a2a2a); }
+
+  /* Simulated frame lines for placeholders */
+  .video-placeholder::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background:
+      repeating-linear-gradient(
+        0deg,
+        transparent,
+        transparent 3px,
+        rgba(255,255,255,0.012) 3px,
+        rgba(255,255,255,0.012) 4px
+      );
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* ── Responsive ── */
+  @media (max-width: 768px) {
+    .switcher {
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 12px 16px;
+    }
+    .switcher button { font-size: 11px; padding: 6px 14px; }
+    .layout-a .side-label { display: none; }
+    .layout-a .video-placeholder { aspect-ratio: 16/9; }
+    .layout-b .masonry {
+      grid-template-columns: 1fr;
+    }
+    .layout-b .m-item,
+    .layout-b .m-item:nth-child(n) {
+      grid-column: 1 / -1 !important;
+    }
+    .layout-b .m-item .video-placeholder,
+    .layout-b .m-item:nth-child(n) .video-placeholder {
+      aspect-ratio: 16/9 !important;
+    }
+    .layout-c .focus-item { margin-bottom: 48px; }
+    .layout-c .focus-meta { flex-wrap: wrap; gap: 10px; }
+    .layout-c .focus-meta .divider { display: none; }
+  }
+</style>
+</head>
+<body>
+
+<!-- Layout Switcher -->
+<div class="switcher">
+  <span class="switcher-label">Layout</span>
+  <button class="active" onclick="switchLayout('a')">A — Cinematic Rows</button>
+  <button onclick="switchLayout('b')">B — Asymmetric Grid</button>
+  <button onclick="switchLayout('c')">C — Single Focus</button>
+  <button onclick="switchLayout('d')">D — Film Reel</button>
+</div>
+
+<!-- ════════════════════════════════════════
+     LAYOUT A — Staggered Cinematic Rows
+════════════════════════════════════════ -->
+<section class="layout-section layout-a active" id="layout-a">
+  <div class="section-header">
+    <h2>Selected Work</h2>
+    <p>Ultra-wide cinematic rows, each sliding in from alternating sides. Feels like a film reel unspooling. Titles overlay each frame.</p>
+  </div>
+
+  <div class="video-row" data-anim="left">
+    <div class="side-label"><span class="num">01</span><h3>Storybook Waves</h3><span>AI Video</span></div>
+    <div class="video-placeholder ph-1"><div class="play-btn"></div></div>
+  </div>
+  <div class="video-row from-right" data-anim="right">
+    <div class="side-label"><span class="num">02</span><h3>The Bench by the Sea</h3><span>Short Film</span></div>
+    <div class="video-placeholder ph-2"><div class="play-btn"></div></div>
+  </div>
+  <div class="video-row" data-anim="left">
+    <div class="side-label"><span class="num">03</span><h3>Tripwire</h3><span>Short Film Trailer</span></div>
+    <div class="video-placeholder ph-3"><div class="play-btn"></div></div>
+  </div>
+  <div class="video-row from-right" data-anim="right">
+    <div class="side-label"><span class="num">04</span><h3>Look Up</h3><span>AI Video</span></div>
+    <div class="video-placeholder ph-4"><div class="play-btn"></div></div>
+  </div>
+  <div class="video-row" data-anim="left">
+    <div class="side-label"><span class="num">05</span><h3>Cornwall Aerial</h3><span>Aerial</span></div>
+    <div class="video-placeholder ph-5"><div class="play-btn"></div></div>
+  </div>
+  <div class="video-row from-right" data-anim="right">
+    <div class="side-label"><span class="num">06</span><h3>Spacestation</h3><span>Animation</span></div>
+    <div class="video-placeholder ph-6"><div class="play-btn"></div></div>
+  </div>
+  <div class="video-row" data-anim="left">
+    <div class="side-label"><span class="num">07</span><h3>Brighton Pride</h3><span>Motion Graphics</span></div>
+    <div class="video-placeholder ph-7"><div class="play-btn"></div></div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     LAYOUT B — Asymmetric Masonry Grid
+════════════════════════════════════════ -->
+<section class="layout-section layout-b" id="layout-b">
+  <div class="section-header">
+    <h2>Selected Work</h2>
+    <p>An asymmetric grid with varying sizes — the eye naturally moves across the page. Each tile fades up on scroll with staggered timing.</p>
+  </div>
+
+  <div class="masonry">
+    <div class="m-item">
+      <div class="video-placeholder ph-1">
+        <div class="play-btn"></div>
+        <div class="video-label"><h3>Storybook Waves</h3><span>AI Video</span></div>
+      </div>
+    </div>
+    <div class="m-item">
+      <div class="video-placeholder ph-2">
+        <div class="play-btn"></div>
+        <div class="video-label"><h3>The Bench by the Sea</h3><span>Short Film</span></div>
+      </div>
+    </div>
+    <div class="m-item">
+      <div class="video-placeholder ph-3">
+        <div class="play-btn"></div>
+        <div class="video-label"><h3>Tripwire</h3><span>Short Film Trailer</span></div>
+      </div>
+    </div>
+    <div class="m-item">
+      <div class="video-placeholder ph-4">
+        <div class="play-btn"></div>
+        <div class="video-label"><h3>Look Up</h3><span>AI Video</span></div>
+      </div>
+    </div>
+    <div class="m-item">
+      <div class="video-placeholder ph-5">
+        <div class="play-btn"></div>
+        <div class="video-label"><h3>Cornwall Aerial</h3><span>Aerial</span></div>
+      </div>
+    </div>
+    <div class="m-item">
+      <div class="video-placeholder ph-6">
+        <div class="play-btn"></div>
+        <div class="video-label"><h3>Spacestation</h3><span>Animation</span></div>
+      </div>
+    </div>
+    <div class="m-item">
+      <div class="video-placeholder ph-7">
+        <div class="play-btn"></div>
+        <div class="video-label"><h3>Brighton Pride</h3><span>Motion Graphics</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     LAYOUT C — Single Column Focus
+════════════════════════════════════════ -->
+<section class="layout-section layout-c" id="layout-c">
+  <div class="section-header">
+    <h2>Selected Work</h2>
+    <p>One video at a time, full attention. Each slides in from alternating sides with a category pill and numbering. Clean, editorial feel.</p>
+  </div>
+
+  <div class="focus-list">
+    <div class="focus-item from-left">
+      <div class="video-placeholder ph-1"><div class="play-btn"></div></div>
+      <div class="focus-meta">
+        <span class="pill">AI Video</span>
+        <h3>Storybook Waves</h3>
+        <div class="divider"></div>
+        <span class="idx">01 / 07</span>
+      </div>
+    </div>
+    <div class="focus-item from-right">
+      <div class="video-placeholder ph-2"><div class="play-btn"></div></div>
+      <div class="focus-meta">
+        <span class="pill">Short Film</span>
+        <h3>The Bench by the Sea</h3>
+        <div class="divider"></div>
+        <span class="idx">02 / 07</span>
+      </div>
+    </div>
+    <div class="focus-item from-left">
+      <div class="video-placeholder ph-3"><div class="play-btn"></div></div>
+      <div class="focus-meta">
+        <span class="pill">Short Film</span>
+        <h3>Tripwire</h3>
+        <div class="divider"></div>
+        <span class="idx">03 / 07</span>
+      </div>
+    </div>
+    <div class="focus-item from-right">
+      <div class="video-placeholder ph-4"><div class="play-btn"></div></div>
+      <div class="focus-meta">
+        <span class="pill">AI Video</span>
+        <h3>Look Up</h3>
+        <div class="divider"></div>
+        <span class="idx">04 / 07</span>
+      </div>
+    </div>
+    <div class="focus-item from-left">
+      <div class="video-placeholder ph-5"><div class="play-btn"></div></div>
+      <div class="focus-meta">
+        <span class="pill">Aerial</span>
+        <h3>Cornwall Aerial</h3>
+        <div class="divider"></div>
+        <span class="idx">05 / 07</span>
+      </div>
+    </div>
+    <div class="focus-item from-right">
+      <div class="video-placeholder ph-6"><div class="play-btn"></div></div>
+      <div class="focus-meta">
+        <span class="pill">Animation</span>
+        <h3>Spacestation</h3>
+        <div class="divider"></div>
+        <span class="idx">06 / 07</span>
+      </div>
+    </div>
+    <div class="focus-item from-left">
+      <div class="video-placeholder ph-7"><div class="play-btn"></div></div>
+      <div class="focus-meta">
+        <span class="pill">Motion Graphics</span>
+        <h3>Brighton Pride</h3>
+        <div class="divider"></div>
+        <span class="idx">07 / 07</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ════════════════════════════════════════
+     LAYOUT D — Horizontal Film Reel
+════════════════════════════════════════ -->
+<section class="layout-section layout-d" id="layout-d">
+  <div class="section-header">
+    <h2>Selected Work</h2>
+    <p>A horizontal scroll reel — like scrubbing through a timeline. Each card snaps into focus. Scroll indicator shows your position.</p>
+  </div>
+
+  <div class="reel-wrapper">
+    <div class="reel-track" id="reel-track">
+      <div class="reel-item">
+        <div class="video-placeholder ph-1"><div class="play-btn"></div></div>
+        <div class="reel-info"><h3>Storybook Waves</h3><span>AI Video</span></div>
+      </div>
+      <div class="reel-item">
+        <div class="video-placeholder ph-2"><div class="play-btn"></div></div>
+        <div class="reel-info"><h3>The Bench by the Sea</h3><span>Short Film</span></div>
+      </div>
+      <div class="reel-item">
+        <div class="video-placeholder ph-3"><div class="play-btn"></div></div>
+        <div class="reel-info"><h3>Tripwire</h3><span>Short Film</span></div>
+      </div>
+      <div class="reel-item">
+        <div class="video-placeholder ph-4"><div class="play-btn"></div></div>
+        <div class="reel-info"><h3>Look Up</h3><span>AI Video</span></div>
+      </div>
+      <div class="reel-item">
+        <div class="video-placeholder ph-5"><div class="play-btn"></div></div>
+        <div class="reel-info"><h3>Cornwall Aerial</h3><span>Aerial</span></div>
+      </div>
+      <div class="reel-item">
+        <div class="video-placeholder ph-6"><div class="play-btn"></div></div>
+        <div class="reel-info"><h3>Spacestation</h3><span>Animation</span></div>
+      </div>
+      <div class="reel-item">
+        <div class="video-placeholder ph-7"><div class="play-btn"></div></div>
+        <div class="reel-info"><h3>Brighton Pride</h3><span>Motion Graphics</span></div>
+      </div>
+    </div>
+    <div class="scroll-line">
+      <span>Scroll →</span>
+      <div class="track"><div class="thumb" id="reel-thumb"></div></div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // ── Layout Switcher ──
+  function switchLayout(id) {
+    document.querySelectorAll('.layout-section').forEach(s => s.classList.remove('active'));
+    document.querySelectorAll('.switcher button').forEach(b => b.classList.remove('active'));
+    document.getElementById('layout-' + id).classList.add('active');
+    event.target.classList.add('active');
+    // Re-trigger animations
+    setTimeout(() => observeAll(), 100);
+  }
+
+  // ── Intersection Observer for scroll animations ──
+  function observeAll() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.video-row, .m-item, .focus-item, .reel-item').forEach(el => {
+      el.classList.remove('visible');
+      observer.observe(el);
+    });
+  }
+
+  // ── Reel scroll indicator ──
+  const reelTrack = document.getElementById('reel-track');
+  const reelThumb = document.getElementById('reel-thumb');
+  if (reelTrack && reelThumb) {
+    reelTrack.addEventListener('scroll', () => {
+      const pct = reelTrack.scrollLeft / (reelTrack.scrollWidth - reelTrack.clientWidth);
+      reelThumb.style.left = (pct * 80) + '%';
+    });
+  }
+
+  // Init
+  observeAll();
+</script>
+</body>
+</html>
