@@ -25,6 +25,7 @@ export default function Hero({ settings }: { settings: SiteSettings }) {
           externalMediaSrc={externalMedia?.src}
           externalMediaType={externalMedia?.mediaType}
           externalMediaMimeType={externalMedia?.mimeType}
+          posterSrc="/hero-poster.webp"
           title={
             settings.heroTitle
               ? `${settings.heroTitle} — showreel`
