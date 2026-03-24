@@ -30,7 +30,8 @@ async function getPagesSitemap(baseUrl: string): Promise<MetadataRoute.Sitemap> 
       defined(slug.current) &&
       slug.current != 'index' &&
       slug.current != 'blog' &&
-      slug.current != 'studio'
+      slug.current != 'studio' &&
+      slug.current != 'api'
     ] | order(_updatedAt desc) {
       'url': $baseUrl + '/' + slug.current,
       'lastModified': _updatedAt,
