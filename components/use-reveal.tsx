@@ -6,6 +6,7 @@ export function useReveal() {
   const timeouts = useRef<NodeJS.Timeout[]>([]);
 
   useEffect(() => {
+    const pendingTimeouts = timeouts.current;
     const reveals = document.querySelectorAll(".reveal");
     const observer = new IntersectionObserver(
       (entries) => {
@@ -14,10 +15,10 @@ export function useReveal() {
             const id = setTimeout(() => {
               entry.target.classList.add("visible");
               // Remove fired timeout from the array
-              const idx = timeouts.current.indexOf(id);
-              if (idx !== -1) timeouts.current.splice(idx, 1);
+              const idx = pendingTimeouts.indexOf(id);
+              if (idx !== -1) pendingTimeouts.splice(idx, 1);
             }, i * 80);
-            timeouts.current.push(id);
+            pendingTimeouts.push(id);
             observer.unobserve(entry.target);
           }
         });
@@ -28,8 +29,8 @@ export function useReveal() {
     reveals.forEach((el) => observer.observe(el));
 
     return () => {
-      timeouts.current.forEach(clearTimeout);
-      timeouts.current.length = 0;
+      pendingTimeouts.forEach(clearTimeout);
+      pendingTimeouts.length = 0;
       observer.disconnect();
     };
   }, []);

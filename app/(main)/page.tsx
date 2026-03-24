@@ -36,7 +36,7 @@ export default async function IndexPage() {
 
   return (
     <HomepageClient>
-      <Nav />
+      <Nav overlayOnMedia />
       <Hero settings={siteSettings} />
       <About settings={siteSettings} />
       <Work items={items} />

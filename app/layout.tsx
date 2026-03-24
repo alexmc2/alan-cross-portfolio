@@ -4,6 +4,7 @@ import { Analytics } from '@vercel/analytics/next';
 import { fontDisplay, fontBody } from '@/lib/fonts';
 import { projectId } from '@/sanity/env';
 import { isIndexableSite, metadataBase, siteUrl } from '@/lib/siteConfig';
+import { ThemeProvider } from '@/components/theme-provider';
 
 export const metadata: Metadata = {
   metadataBase,
@@ -54,7 +55,7 @@ export default function RootLayout({
   ];
 
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <link rel="icon" href="/favicon.ico" sizes="48x48" />
         <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
@@ -66,16 +67,18 @@ export default function RootLayout({
         ))}
       </head>
       <body className={`${fontDisplay.variable} ${fontBody.variable}`}>
-        <a
-          href="#main-content"
-          className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:bg-white focus:px-4 focus:py-2 focus:text-black"
-        >
-          Skip to content
-        </a>
-        <main id="main-content" tabIndex={-1}>
-          {children}
-        </main>
-        <Analytics />
+        <ThemeProvider>
+          <a
+            href="#main-content"
+            className="sr-only focus:not-sr-only focus:fixed focus:top-4 focus:left-4 focus:z-[200] focus:border focus:border-border focus:bg-bg-card focus:px-4 focus:py-2 focus:text-text-primary"
+          >
+            Skip to content
+          </a>
+          <main id="main-content" tabIndex={-1}>
+            {children}
+          </main>
+          <Analytics />
+        </ThemeProvider>
       </body>
     </html>
   );

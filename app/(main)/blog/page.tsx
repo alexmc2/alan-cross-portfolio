@@ -191,8 +191,7 @@ export default async function BlogPage({
                           <div
                             className="w-full h-full"
                             style={{
-                              background:
-                                'linear-gradient(135deg, #151318, #1a1816 50%, #12110f)',
+                              background: 'var(--gradient-surface-placeholder)',
                             }}
                           />
                         )}
@@ -242,7 +241,7 @@ export default async function BlogPage({
                   &larr;
                 </Link>
               ) : (
-                <span className="text-[0.75rem] w-9 h-9 flex items-center justify-center border border-white/10 text-text-muted cursor-default">
+                <span className="text-[0.75rem] w-9 h-9 flex items-center justify-center border border-border text-text-muted cursor-default">
                   &larr;
                 </span>
               )}
@@ -297,7 +296,7 @@ export default async function BlogPage({
                   &rarr;
                 </Link>
               ) : (
-                <span className="text-[0.75rem] w-9 h-9 flex items-center justify-center border border-white/10 text-text-muted cursor-default">
+                <span className="text-[0.75rem] w-9 h-9 flex items-center justify-center border border-border text-text-muted cursor-default">
                   &rarr;
                 </span>
               )}

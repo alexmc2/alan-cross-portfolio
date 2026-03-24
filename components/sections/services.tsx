@@ -53,7 +53,7 @@ export default function Services({ services }: { services: Service[] }) {
             return (
               <div
                 key={service._id}
-                className={`bg-bg-elevated p-10 transition-colors duration-400 hover:bg-bg-card cursor-default ${
+                className={`bg-bg-elevated p-10 transition-colors duration-400 hover:bg-bg-card cursor-default reveal ${
                   isHiddenOnMobile ? 'max-[900px]:hidden' : ''
                 } ${isNewlyVisible ? 'max-[900px]:animate-fade-up' : ''}`}
                 style={{

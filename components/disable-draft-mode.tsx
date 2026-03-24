@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useDraftModeEnvironment } from "next-sanity/hooks";
 
 export function DisableDraftMode() {
@@ -11,11 +12,11 @@ export function DisableDraftMode() {
   }
 
   return (
-    <a
+    <Link
       href="/api/draft-mode/disable"
       className="fixed bottom-4 right-4 bg-accent text-bg-primary px-4 py-2 text-sm font-medium no-underline z-50"
     >
       Disable Draft Mode
-    </a>
+    </Link>
   );
 }

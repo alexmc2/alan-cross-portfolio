@@ -229,7 +229,13 @@ export default function HeroVideo({
             'linear-gradient(170deg, #1a1520, #0d1117 40%, #0a0f14 70%, #0a0a0a)',
         }}
       >
-        <span className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 font-body text-[0.75rem] tracking-[0.3em] uppercase text-text-muted border border-text-muted px-8 py-4 opacity-50">
+        <span
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 border px-8 py-4 font-body text-[0.75rem] tracking-[0.3em] uppercase opacity-50"
+          style={{
+            color: 'var(--color-hero-text-secondary)',
+            borderColor: 'var(--color-hero-text-secondary)',
+          }}
+        >
           &#9654; Showreel plays here
         </span>
       </div>

@@ -5,7 +5,7 @@ import Image from "next/image";
 import { urlFor } from "@/sanity/lib/image";
 import { SETTINGS_QUERYResult } from "@/sanity.types";
 import { useTheme } from "next-themes";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useSyncExternalStore } from "react";
 import { cn } from "@/lib/utils";
 
 type LogoVariant = "header" | "footer";
@@ -34,15 +34,14 @@ export default function Logo({
   ariaHidden,
 }: LogoProps) {
   const { resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState(false);
+  const hasHydrated = useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false
+  );
 
-  // Only render theme-dependent content after hydration
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  // During SSR or before hydration, use light theme as default
-  const themeToUse = mounted ? resolvedTheme : "light";
+  // During SSR or before hydration, use dark mode as the site default
+  const themeToUse = hasHydrated ? resolvedTheme : "dark";
 
   // Select the appropriate logo based on resolved theme (handles "system" correctly)
   const logoGroup = useMemo(() => {

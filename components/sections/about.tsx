@@ -69,8 +69,7 @@ export default function About({ settings }: { settings: SiteSettings }) {
             <div
               className="w-full h-full flex items-center justify-center text-[0.7rem] tracking-[0.2em] uppercase text-text-muted"
               style={{
-                background:
-                  'linear-gradient(135deg, var(--color-bg-card), #1a1816)',
+                background: 'var(--gradient-image-fallback)',
               }}
             >
               Photo
