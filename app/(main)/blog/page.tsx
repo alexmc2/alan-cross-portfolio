@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import Nav from '@/components/nav';
 import SiteFooter from '@/components/sections/site-footer';
+import BlogCategoryFilter from './category-filter';
 import type { Metadata } from 'next';
 import type { Post } from '@/types';
 
@@ -31,6 +32,29 @@ function buildHref(params: { category?: string; page?: number }) {
   return qs ? `/blog?${qs}` : '/blog';
 }
 
+function getPostCategories(post: Post) {
+  const categories = new Map<string, NonNullable<Post['category']>>();
+
+  for (const category of [post.category, ...(post.categories ?? [])]) {
+    if (!category?.title) continue;
+
+    const key = category.slug?.current ?? category.title;
+    if (!categories.has(key)) {
+      categories.set(key, category);
+    }
+  }
+
+  return Array.from(categories.values());
+}
+
+function compareCategoryUsage(
+  a: { title: string; count: number },
+  b: { title: string; count: number }
+) {
+  if (b.count !== a.count) return b.count - a.count;
+  return a.title.localeCompare(b.title);
+}
+
 export default async function BlogPage({
   searchParams,
 }: {
@@ -38,19 +62,34 @@ export default async function BlogPage({
 }) {
   const { category, page } = await searchParams;
   const allPosts = ((await fetchSanityPosts()) || []) as Post[];
+  const categoryCounts = new Map<string, number>();
+
+  for (const post of allPosts) {
+    for (const postCategory of getPostCategories(post)) {
+      categoryCounts.set(
+        postCategory.title,
+        (categoryCounts.get(postCategory.title) ?? 0) + 1
+      );
+    }
+  }
 
   // Extract unique categories
-  const categories = Array.from(
-    new Set(
-      allPosts
-        .map((p) => p.category?.title)
-        .filter((t): t is string => Boolean(t))
-    )
-  ).sort();
+  const categories = Array.from(categoryCounts.keys()).sort();
+  const rankedCategories = Array.from(categoryCounts, ([title, count]) => ({
+    title,
+    count,
+  })).sort(compareCategoryUsage);
+  const visibleCategories = rankedCategories.slice(0, 9).map(({ title }) => title);
+  const extraCategories = rankedCategories.slice(9).map(({ title }) => title);
+  const isMoreInitiallyOpen = extraCategories.includes(category || '');
 
   // Filter by category
   const filteredPosts = category
-    ? allPosts.filter((p) => p.category?.title === category)
+    ? allPosts.filter((post) =>
+        getPostCategories(post).some(
+          (postCategory) => postCategory.title === category
+        )
+      )
     : allPosts;
 
   // Pagination
@@ -74,30 +113,47 @@ export default async function BlogPage({
 
           {/* Category filters */}
           {categories.length > 0 && (
-            <div className="flex gap-3 mb-12 overflow-x-auto max-md:pb-2 md:flex-wrap">
-              <Link
-                href="/blog"
-                className={`shrink-0 text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 border transition-colors duration-300 no-underline whitespace-nowrap ${
-                  !category
-                    ? 'bg-accent text-bg-primary border-accent font-semibold'
-                    : 'border-accent/30 text-text-secondary hover:border-accent hover:text-accent'
-                }`}
-              >
-                All
-              </Link>
-              {categories.map((cat) => (
+            <>
+              <div className="flex gap-3 mb-12 overflow-x-auto pb-2 md:hidden">
                 <Link
-                  key={cat}
-                  href={buildHref({ category: cat })}
+                  href="/blog"
                   className={`shrink-0 text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 border transition-colors duration-300 no-underline whitespace-nowrap ${
-                    category === cat
+                    !category
                       ? 'bg-accent text-bg-primary border-accent font-semibold'
                       : 'border-accent/30 text-text-secondary hover:border-accent hover:text-accent'
                   }`}
                 >
-                  {cat}
+                  All
                 </Link>
-              ))}
+                {categories.map((cat) => (
+                  <Link
+                    key={cat}
+                    href={buildHref({ category: cat })}
+                    className={`shrink-0 text-[0.7rem] tracking-[0.15em] uppercase px-4 py-2 border transition-colors duration-300 no-underline whitespace-nowrap ${
+                      category === cat
+                        ? 'bg-accent text-bg-primary border-accent font-semibold'
+                        : 'border-accent/30 text-text-secondary hover:border-accent hover:text-accent'
+                    }`}
+                  >
+                    {cat}
+                  </Link>
+                ))}
+              </div>
+
+              <BlogCategoryFilter
+                category={category}
+                visibleCategories={visibleCategories}
+                extraCategories={extraCategories}
+                initiallyOpen={isMoreInitiallyOpen}
+              />
+            </>
+          )}
+
+          {totalPages > 1 && (
+            <div className="flex justify-end mb-6">
+              <span className="text-[0.75rem] tracking-[0.12em] uppercase text-text-secondary whitespace-nowrap">
+                Page {safePage} of {totalPages}
+              </span>
             </div>
           )}
 
@@ -218,6 +274,7 @@ export default async function BlogPage({
                     <Link
                       key={p}
                       href={buildHref({ category, page: p })}
+                      aria-current={p === safePage ? 'page' : undefined}
                       className={`text-[0.75rem] w-9 h-9 flex items-center justify-center border no-underline transition-colors duration-300 ${
                         p === safePage
                           ? 'bg-accent text-bg-primary border-accent font-semibold'

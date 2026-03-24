@@ -79,6 +79,21 @@ function removeLeadingBodyImage(body: Post["body"], hasMainImage: boolean) {
   return normalizedBody;
 }
 
+function getPostCategories(post: Post) {
+  const categories = new Map<string, NonNullable<Post["category"]>>();
+
+  for (const category of [post.category, ...(post.categories ?? [])]) {
+    if (!category?.title) continue;
+
+    const key = category.slug?.current ?? category.title;
+    if (!categories.has(key)) {
+      categories.set(key, category);
+    }
+  }
+
+  return Array.from(categories.values());
+}
+
 export default async function PostPage(props: {
   params: Promise<{ slug: string }>;
 }) {
@@ -92,6 +107,7 @@ export default async function PostPage(props: {
   }
 
   const body = removeLeadingBodyImage(post.body, Boolean(post.mainImage?.asset));
+  const categories = getPostCategories(post);
 
   return (
     <>
@@ -108,12 +124,15 @@ export default async function PostPage(props: {
 
           {/* Header */}
           <header className="mb-12">
-            <div className="flex items-center gap-4 mb-4">
-              {post.category?.title && (
-                <span className="text-[0.65rem] tracking-[0.2em] uppercase text-accent font-medium">
-                  {post.category.title}
+            <div className="flex flex-wrap items-center gap-4 mb-4">
+              {categories.map((category) => (
+                <span
+                  key={category.slug?.current ?? category.title}
+                  className="text-[0.65rem] tracking-[0.2em] uppercase text-accent font-medium"
+                >
+                  {category.title}
                 </span>
-              )}
+              ))}
               <span className="text-[0.7rem] text-text-muted">
                 {formatDate(post.publishedAt)}
               </span>
