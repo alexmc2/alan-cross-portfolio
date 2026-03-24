@@ -18,7 +18,7 @@ export function CopyButton({ code }: CopyButtonProps) {
 
   return (
     <button
-      className="p-2 rounded-md transition-colors hover:bg-white/10"
+      className="rounded-md p-2 transition-colors hover:bg-bg-primary"
       onClick={copy}
       aria-label="Copy code"
     >

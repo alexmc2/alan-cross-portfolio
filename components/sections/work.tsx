@@ -25,11 +25,9 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
       }
       const container = containerRef.current;
       if (container) {
-        container
-          .querySelectorAll('.work-enter')
-          .forEach((el, i) => {
-            if (i >= MOBILE_VISIBLE_ITEMS) el.classList.remove('visible');
-          });
+        container.querySelectorAll('.work-enter').forEach((el, i) => {
+          if (i >= MOBILE_VISIBLE_ITEMS) el.classList.remove('visible');
+        });
       }
       return MOBILE_VISIBLE_ITEMS;
     });
@@ -40,7 +38,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
     if (!container) return;
 
     const els = container.querySelectorAll<HTMLElement>(
-      '.work-enter:not(.visible)'
+      '.work-enter:not(.visible)',
     );
     if (!els.length) return;
 
@@ -58,7 +56,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
           observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' }
+      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
     );
 
     els.forEach((el) => observer.observe(el));
@@ -71,7 +69,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
 
   return (
     <section id="work" className="py-28 px-12 max-md:py-20 max-md:px-6">
-      <div className="max-w-[1100px] mx-auto">
+      <div className="max-w-[1200px] mx-auto">
         <div className="slabel">Selected Work</div>
         <div ref={containerRef} id="work-grid" className="mt-12">
           {items.map((item, index) => {
@@ -125,7 +123,9 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                       className="object-cover"
                       sizes="(max-width: 900px) 100vw, 1100px"
                       placeholder={
-                        item.thumbnail?.asset?.metadata?.lqip ? 'blur' : undefined
+                        item.thumbnail?.asset?.metadata?.lqip
+                          ? 'blur'
+                          : undefined
                       }
                       blurDataURL={item.thumbnail?.asset?.metadata?.lqip}
                     />
@@ -133,11 +133,15 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                     <div
                       className="w-full h-full flex items-center justify-center"
                       style={{
-                        background:
-                          'linear-gradient(135deg, #151318, #1a1816 50%, #12110f)',
+                        background: 'var(--gradient-surface-placeholder)',
                       }}
                     >
-                      <span className="text-[0.65rem] tracking-[0.25em] uppercase text-text-muted border border-[rgba(255,255,255,0.05)] px-5 py-2.5">
+                      <span
+                        className="border px-5 py-2.5 text-[0.65rem] tracking-[0.25em] uppercase text-text-muted"
+                        style={{
+                          borderColor: 'var(--color-muted-border-soft)',
+                        }}
+                      >
                         {item.category || 'Video'}
                       </span>
                     </div>
@@ -148,16 +152,20 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                     href={destinationHref || '#'}
                     target={destinationHref ? '_blank' : undefined}
                     rel={destinationHref ? 'noopener noreferrer' : undefined}
-                    className="absolute inset-x-0 bottom-0 flex flex-col justify-end p-4 opacity-100 md:inset-0 md:p-8 md:opacity-0 transition-opacity duration-400 md:group-hover:opacity-100 z-10 pointer-events-auto md:pointer-events-none md:group-hover:pointer-events-auto cursor-pointer"
+                    className="absolute inset-x-0 bottom-0 z-10 flex cursor-pointer flex-col justify-end p-4 opacity-100 transition-opacity duration-400 md:inset-0 md:pointer-events-none md:p-8 md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100"
                     style={{
+                      color: 'var(--color-hero-text-primary)',
                       background:
                         'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 35%, transparent 100%)',
                     }}
                   >
-                    <h3 className="font-display text-base md:text-2xl font-semibold mb-1 md:mb-2 drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
+                    <h3 className="mb-1 font-display text-base font-semibold drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] md:mb-2 md:text-2xl">
                       {item.title}
                     </h3>
-                    <p className="text-xs md:text-base text-white/80 tracking-[0.03em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] line-clamp-2">
+                    <p
+                      className="line-clamp-2 text-xs tracking-[0.03em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] md:text-base"
+                      style={{ color: 'var(--color-hero-text-secondary)' }}
+                    >
                       {item.description
                         ? item.description
                         : `${item.category || ''}${item.year ? ` \u2014 ${item.year}` : ''}`}
@@ -168,7 +176,13 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                 {/* Meta row: pill | title | divider | index */}
                 <div className="flex items-center gap-4 mt-5 px-1 max-[900px]:flex-wrap max-[900px]:gap-2.5">
                   {item.category && (
-                    <span className="inline-block shrink-0 whitespace-nowrap text-[11px] font-medium tracking-[2px] uppercase text-accent border border-[rgba(200,164,110,0.15)] bg-[rgba(200,164,110,0.15)] py-1.5 px-4 rounded-full">
+                    <span
+                      className="inline-block shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-[11px] font-medium tracking-[2px] uppercase text-accent"
+                      style={{
+                        borderColor: 'var(--color-accent-soft)',
+                        backgroundColor: 'var(--color-accent-soft)',
+                      }}
+                    >
                       {item.category}
                     </span>
                   )}

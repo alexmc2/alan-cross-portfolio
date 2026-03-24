@@ -144,8 +144,7 @@ export default function DeferredMediaFrame({
             showPoster ? 'opacity-100' : 'opacity-0'
           }`}
           style={{
-            background:
-              'linear-gradient(135deg, #0b0b0d, #141418 50%, #0d0d0f)',
+            background: 'var(--gradient-surface-poster)',
           }}
         >
           <Image
@@ -191,11 +190,13 @@ export default function DeferredMediaFrame({
         <div
           className="absolute inset-0 z-[1] pointer-events-none w-full h-full flex items-center justify-center"
           style={{
-            background:
-              'linear-gradient(135deg, #151318, #1a1816 50%, #12110f)',
+            background: 'var(--gradient-surface-placeholder)',
           }}
         >
-          <span className="text-[0.65rem] tracking-[0.25em] uppercase text-text-muted border border-[rgba(255,255,255,0.05)] px-5 py-2.5">
+          <span
+            className="border px-5 py-2.5 text-[0.65rem] tracking-[0.25em] uppercase text-text-muted"
+            style={{ borderColor: 'var(--color-muted-border-soft)' }}
+          >
             {fallbackLabel}
           </span>
         </div>
