@@ -9,6 +9,8 @@ import DeferredMediaFrame from './deferred-media-frame';
 
 const MOBILE_VISIBLE_ITEMS = 4;
 const STAGGER_MS = 120;
+const WORK_ENTRY_THRESHOLD = 0.03;
+const WORK_ENTRY_ROOT_MARGIN = '0px';
 
 export default function Work({ items }: { items: PortfolioItem[] }) {
   const [visibleCount, setVisibleCount] = useState(MOBILE_VISIBLE_ITEMS);
@@ -56,7 +58,10 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
           observer.unobserve(entry.target);
         });
       },
-      { threshold: 0.12, rootMargin: '0px 0px -40px 0px' },
+      {
+        threshold: WORK_ENTRY_THRESHOLD,
+        rootMargin: WORK_ENTRY_ROOT_MARGIN,
+      },
     );
 
     els.forEach((el) => observer.observe(el));
@@ -186,20 +191,6 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                       {item.category}
                     </span>
                   )}
-                  <h3 className="text-xl font-medium leading-tight max-[900px]:text-[17px]">
-                    {destinationHref ? (
-                      <a
-                        href={destinationHref}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="text-text-primary no-underline transition-colors duration-300 hover:text-accent"
-                      >
-                        {item.title}
-                      </a>
-                    ) : (
-                      item.title
-                    )}
-                  </h3>
                   <div className="flex-1 h-px bg-border min-w-10 max-[900px]:hidden" />
                   <span className="font-display text-xs tracking-[2px] text-text-muted whitespace-nowrap shrink-0">
                     {padIndex} / {padTotal}
@@ -215,7 +206,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
             onClick={handleToggle}
             aria-expanded={!hasMoreItems}
             aria-controls="work-grid"
-            className="mt-8 inline-flex items-center gap-2 bg-transparent p-0 text-[0.7rem] tracking-[0.2em] uppercase text-accent transition-opacity duration-300 hover:opacity-80"
+            className="mt-8 inline-flex items-center gap-2 bg-transparent p-0 sm:text-[1rem] text-[0.8rem] tracking-[0.2em] uppercase text-accent transition-opacity duration-300 hover:opacity-80"
           >
             <span>{hasMoreItems ? 'See more work' : 'See less work'}</span>
             <svg
