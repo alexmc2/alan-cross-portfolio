@@ -63,7 +63,7 @@ export default defineType({
     defineField({
       name: 'thumbnail',
       title: 'Thumbnail',
-      description: 'Image shown in the portfolio grid',
+      description: 'Poster image shown before the video loads',
       type: 'image',
       options: { hotspot: true },
     }),
@@ -82,7 +82,7 @@ export default defineType({
     defineField({
       name: 'featured',
       title: 'Featured',
-      description: 'Featured items span full width in the grid',
+      description: 'Mark as a featured portfolio piece',
       type: 'boolean',
       initialValue: false,
     }),

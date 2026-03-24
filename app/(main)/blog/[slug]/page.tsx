@@ -119,7 +119,7 @@ export default async function PostPage(props: {
             href="/blog"
             className="text-[0.72rem] tracking-[0.15em] uppercase text-text-muted no-underline transition-colors duration-300 hover:text-accent mb-8 inline-block"
           >
-            &larr; Back to Blog
+            &larr; Back to Blogs
           </Link>
 
           {/* Header */}

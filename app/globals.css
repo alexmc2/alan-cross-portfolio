@@ -79,6 +79,36 @@
   transform: translateY(0);
 }
 
+/* Work item alternating entrance animation */
+.work-enter {
+  opacity: 0;
+  transition:
+    opacity 0.9s cubic-bezier(0.16, 1, 0.3, 1),
+    transform 0.9s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.work-enter.from-left {
+  transform: translateX(-80px);
+}
+
+.work-enter.from-right {
+  transform: translateX(80px);
+}
+
+.work-enter.visible {
+  opacity: 1;
+  transform: translateX(0);
+}
+
+@media (max-width: 900px) {
+  .work-enter.from-left:not(.visible) {
+    transform: translateX(-30px);
+  }
+  .work-enter.from-right:not(.visible) {
+    transform: translateX(30px);
+  }
+}
+
 /* Section label pattern */
 .slabel {
   font-size: 0.65rem;
