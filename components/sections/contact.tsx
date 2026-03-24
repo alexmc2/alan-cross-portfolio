@@ -42,7 +42,7 @@ export default function Contact({
   return (
     <section
       id="contact"
-      className="py-28 px-12 bg-bg-elevated border-t border-border max-md:py-20 max-md:px-6"
+      className="py-28 px-12 bg-bg-elevated border-t border-border max-md:px-6 max-md:pt-20 max-md:pb-8"
     >
       <div className="max-w-[1200px] mx-auto grid grid-cols-2 gap-20 items-start max-[900px]:grid-cols-1 max-[900px]:gap-12">
         {/* Left column */}

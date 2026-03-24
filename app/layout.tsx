@@ -78,8 +78,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="48x48" />
-        <link rel="icon" href="/images/favicon.svg" type="image/svg+xml" />
+        <link rel="icon" href="/images/favicon.svg?v=20260324-8" sizes="any" type="image/svg+xml" />
         <link rel="preconnect" href={sanityCdnOrigin} crossOrigin="anonymous" />
         <link rel="preconnect" href={cloudinaryOrigin} crossOrigin="anonymous" />
         <link rel="preconnect" href={vimeoPlayerOrigin} crossOrigin="anonymous" />

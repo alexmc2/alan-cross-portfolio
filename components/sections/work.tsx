@@ -134,6 +134,10 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
             const displayMode = getDisplayMode(item.displayMode);
             const mediaFitClass =
               displayMode === 'cover' ? 'object-cover' : 'object-contain';
+            const containInsetClass =
+              displayMode === 'contain'
+                ? '-inset-px w-[calc(100%+2px)] h-[calc(100%+2px)]'
+                : 'inset-0 w-full h-full';
             const thumbnailUrl = item.thumbnail?.asset
               ? urlFor(item.thumbnail).width(1200).url()
               : null;
@@ -165,19 +169,21 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                       displayMode={displayMode}
                     />
                   ) : thumbnailUrl ? (
-                    <Image
-                      src={thumbnailUrl}
-                      alt={item.title}
-                      fill
-                      className={mediaFitClass}
-                      sizes="(max-width: 900px) 100vw, 1200px"
-                      placeholder={
-                        item.thumbnail?.asset?.metadata?.lqip
-                          ? 'blur'
-                          : undefined
-                      }
-                      blurDataURL={item.thumbnail?.asset?.metadata?.lqip}
-                    />
+                    <div className={`absolute ${containInsetClass}`}>
+                      <Image
+                        src={thumbnailUrl}
+                        alt={item.title}
+                        fill
+                        className={mediaFitClass}
+                        sizes="(max-width: 900px) 100vw, 1200px"
+                        placeholder={
+                          item.thumbnail?.asset?.metadata?.lqip
+                            ? 'blur'
+                            : undefined
+                        }
+                        blurDataURL={item.thumbnail?.asset?.metadata?.lqip}
+                      />
+                    </div>
                   ) : (
                     <div
                       className="w-full h-full flex items-center justify-center"
@@ -223,7 +229,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                 </div>
 
                 {/* Meta row: pill | title | divider | index */}
-                <div className="flex items-center gap-4 mt-5 px-1 max-[900px]:flex-wrap max-[900px]:gap-2.5">
+                <div className="mt-5 flex items-center gap-4 px-1 max-[900px]:justify-between max-[900px]:gap-3">
                   {item.category && (
                     <span
                       className="inline-block shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-[11px] font-medium tracking-[2px] uppercase text-accent"

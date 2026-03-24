@@ -134,10 +134,14 @@ export default function DeferredMediaFrame({
   const showFallback = !posterSrc && (!shouldLoad || !isFrameReady);
   const mediaFitClass =
     displayMode === 'cover' ? 'object-cover' : 'object-contain';
+  const containInsetClass =
+    displayMode === 'contain'
+      ? '-inset-px w-[calc(100%+2px)] h-[calc(100%+2px)]'
+      : 'inset-0 w-full h-full';
   const iframeClassName =
     displayMode === 'cover'
       ? 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none'
-      : 'absolute inset-0 w-full h-full border-0 pointer-events-none';
+      : `absolute ${containInsetClass} border-0 pointer-events-none`;
 
   return (
     <div
@@ -155,15 +159,17 @@ export default function DeferredMediaFrame({
             background: 'var(--gradient-surface-poster)',
           }}
         >
-          <Image
-            src={posterSrc}
-            alt={title}
-            fill
-            className={mediaFitClass}
-            sizes={sizes}
-            placeholder={posterBlurDataURL ? 'blur' : undefined}
-            blurDataURL={posterBlurDataURL}
-          />
+          <div className={`absolute ${containInsetClass}`}>
+            <Image
+              src={posterSrc}
+              alt={title}
+              fill
+              className={mediaFitClass}
+              sizes={sizes}
+              placeholder={posterBlurDataURL ? 'blur' : undefined}
+              blurDataURL={posterBlurDataURL}
+            />
+          </div>
         </div>
       ) : null}
 
@@ -176,7 +182,7 @@ export default function DeferredMediaFrame({
             loop
             playsInline
             preload="metadata"
-            className={`absolute inset-0 w-full h-full pointer-events-none ${mediaFitClass}`}
+            className={`absolute pointer-events-none ${mediaFitClass} ${containInsetClass}`}
             onLoadedData={handleFrameLoad}
           >
             <source src={src} {...(mimeType ? { type: mimeType } : {})} />
