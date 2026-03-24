@@ -20,6 +20,8 @@ export type SiteSettings = {
   aboutBody?: any[];
   aboutImage?: SanityImage;
   aboutImagePosition?: 'top' | 'upper' | 'center' | 'lower' | 'bottom';
+  aboutImageAspectRatio?: 'portrait' | 'square' | 'original';
+  aboutImageAlignment?: 'section' | 'text';
   stats?: Array<{
     _key: string;
     number: string;

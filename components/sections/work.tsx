@@ -69,7 +69,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
 
   return (
     <section id="work" className="py-28 px-12 max-md:py-20 max-md:px-6">
-      <div className="max-w-[1100px] mx-auto">
+      <div className="max-w-[1200px] mx-auto">
         <div className="slabel">Selected Work</div>
         <div ref={containerRef} id="work-grid" className="mt-12">
           {items.map((item, index) => {
@@ -186,7 +186,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                       {item.category}
                     </span>
                   )}
-                  {/* <h3 className="text-xl font-medium leading-tight max-[900px]:text-[17px]">
+                  <h3 className="text-xl font-medium leading-tight max-[900px]:text-[17px]">
                     {destinationHref ? (
                       <a
                         href={destinationHref}
@@ -199,7 +199,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                     ) : (
                       item.title
                     )}
-                  </h3> */}
+                  </h3>
                   <div className="flex-1 h-px bg-border min-w-10 max-[900px]:hidden" />
                   <span className="font-display text-xs tracking-[2px] text-text-muted whitespace-nowrap shrink-0">
                     {padIndex} / {padTotal}

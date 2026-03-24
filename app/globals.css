@@ -32,7 +32,7 @@
 [data-theme='light'] {
   /* Backgrounds — neutral #fafafa base, slate-100 cards */
   --color-bg-primary: #fafafa;
-  --color-bg-elevated: #ffffff;
+  --color-bg-elevated: #fafafa;
   --color-bg-card: #ffffff;
 
   /* Text — dark navy */

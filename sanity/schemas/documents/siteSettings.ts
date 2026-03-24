@@ -144,6 +144,38 @@ export default defineType({
       initialValue: 'upper',
     }),
     defineField({
+      name: 'aboutImageAspectRatio',
+      title: 'About Image Aspect Ratio',
+      description: 'Controls the frame shape used for the About image.',
+      type: 'string',
+      group: 'about',
+      options: {
+        list: [
+          { title: 'Portrait (3:4) — default', value: 'portrait' },
+          { title: 'Square (1:1)', value: 'square' },
+          { title: 'Original upload ratio', value: 'original' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'portrait',
+    }),
+    defineField({
+      name: 'aboutImageAlignment',
+      title: 'About Image Alignment',
+      description:
+        'Controls whether the image aligns with the section label or with the main text block.',
+      type: 'string',
+      group: 'about',
+      options: {
+        list: [
+          { title: 'Section top — default', value: 'section' },
+          { title: 'Text block (top and bottom)', value: 'text' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'section',
+    }),
+    defineField({
       name: 'stats',
       title: 'Stats',
       description:
