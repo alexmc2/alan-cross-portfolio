@@ -1,5 +1,6 @@
 // sanity/lib/fetch.ts
 import { sanityFetch } from '@/sanity/lib/live';
+import { client } from '@/sanity/lib/client';
 import { SITE_SETTINGS_QUERY } from '@/sanity/queries/siteSettings';
 import { PORTFOLIO_ITEMS_QUERY } from '@/sanity/queries/portfolioItem';
 import { SERVICES_QUERY } from '@/sanity/queries/service';
@@ -17,6 +18,12 @@ export const fetchSiteSettings = async () => {
     query: SITE_SETTINGS_QUERY,
   });
   return data;
+};
+
+export const fetchSiteSettingsMetadata = async () => {
+  return client.withConfig({ stega: false, perspective: 'published' }).fetch(
+    SITE_SETTINGS_QUERY
+  );
 };
 
 export const fetchPortfolioItems = async () => {

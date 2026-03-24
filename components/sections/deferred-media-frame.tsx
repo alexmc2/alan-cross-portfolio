@@ -17,6 +17,7 @@ type DeferredMediaFrameProps = {
   fallbackLabel: string;
   posterSrc?: string;
   posterBlurDataURL?: string;
+  displayMode?: 'contain' | 'cover';
 };
 
 export default function DeferredMediaFrame({
@@ -28,6 +29,7 @@ export default function DeferredMediaFrame({
   fallbackLabel,
   posterSrc,
   posterBlurDataURL,
+  displayMode = 'contain',
 }: DeferredMediaFrameProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
@@ -130,6 +132,12 @@ export default function DeferredMediaFrame({
 
   const showPoster = Boolean(posterSrc) && (!shouldLoad || !isFrameReady);
   const showFallback = !posterSrc && (!shouldLoad || !isFrameReady);
+  const mediaFitClass =
+    displayMode === 'cover' ? 'object-cover' : 'object-contain';
+  const iframeClassName =
+    displayMode === 'cover'
+      ? 'absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none'
+      : 'absolute inset-0 w-full h-full border-0 pointer-events-none';
 
   return (
     <div
@@ -151,7 +159,7 @@ export default function DeferredMediaFrame({
             src={posterSrc}
             alt={title}
             fill
-            className="object-cover"
+            className={mediaFitClass}
             sizes={sizes}
             placeholder={posterBlurDataURL ? 'blur' : undefined}
             blurDataURL={posterBlurDataURL}
@@ -168,7 +176,7 @@ export default function DeferredMediaFrame({
             loop
             playsInline
             preload="metadata"
-            className="absolute inset-0 w-full h-full object-cover pointer-events-none"
+            className={`absolute inset-0 w-full h-full pointer-events-none ${mediaFitClass}`}
             onLoadedData={handleFrameLoad}
           >
             <source src={src} {...(mimeType ? { type: mimeType } : {})} />
@@ -176,7 +184,7 @@ export default function DeferredMediaFrame({
         ) : (
           <iframe
             src={src}
-            className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[177.78vh] min-w-full h-[56.25vw] min-h-full border-0 pointer-events-none"
+            className={iframeClassName}
             allow="autoplay; fullscreen; encrypted-media"
             allowFullScreen
             loading="eager"

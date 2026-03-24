@@ -80,6 +80,40 @@ export default defineType({
       type: 'string',
     }),
     defineField({
+      name: 'aspectRatio',
+      title: 'Aspect Ratio',
+      description:
+        'Container shape for this item. Auto uses the thumbnail dimensions when available, otherwise falls back to widescreen.',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Auto (use source shape)', value: 'auto' },
+          { title: 'Widescreen (16:9)', value: '16:9' },
+          { title: 'Standard (4:3)', value: '4:3' },
+          { title: 'Square (1:1)', value: '1:1' },
+          { title: 'Portrait (9:16)', value: '9:16' },
+          { title: 'Cinematic (21:9)', value: '21:9' },
+        ],
+        layout: 'dropdown',
+      },
+      initialValue: 'auto',
+    }),
+    defineField({
+      name: 'displayMode',
+      title: 'Display Mode',
+      description:
+        'How the media fills its container. "Fit" shows the entire frame (may add bars). "Fill" crops to fill the container.',
+      type: 'string',
+      options: {
+        list: [
+          { title: 'Fit (show full frame)', value: 'contain' },
+          { title: 'Fill (crop to fit)', value: 'cover' },
+        ],
+        layout: 'radio',
+      },
+      initialValue: 'contain',
+    }),
+    defineField({
       name: 'featured',
       title: 'Featured',
       description: 'Mark as a featured portfolio piece',

@@ -3,38 +3,59 @@ import './globals.css';
 import { Analytics } from '@vercel/analytics/next';
 import { fontDisplay, fontBody } from '@/lib/fonts';
 import { projectId } from '@/sanity/env';
-import { isIndexableSite, metadataBase, siteUrl } from '@/lib/siteConfig';
+import { isIndexableSite, metadataBase } from '@/lib/siteConfig';
+import {
+  SITE_NAME,
+  resolveSiteDescription,
+  resolveSiteTitle,
+  resolveSocialImages,
+  buildCanonicalUrl,
+} from '@/lib/metadata';
+import { fetchSiteSettingsMetadata } from '@/sanity/lib/fetch';
 import { ThemeProvider } from '@/components/theme-provider';
 
-export const metadata: Metadata = {
-  metadataBase,
-  title: {
-    template: '%s | Alan Cross',
-    default: 'Alan Cross | AI Film & Video Production',
-  },
-  description:
-    'Screenwriter, filmmaker and AI generative video producer. Creating exceptional content using both traditional production and AI-driven workflows.',
-  openGraph: {
-    title: 'Alan Cross | AI Film & Video Production',
-    description:
-      'Screenwriter, filmmaker and AI generative video producer. Creating exceptional content using both traditional production and AI-driven workflows.',
-    locale: 'en_GB',
-    type: 'website',
-    url: siteUrl,
-  },
-  alternates: {
-    canonical: '/',
-  },
-  robots: isIndexableSite
-    ? {
-        index: true,
-        follow: true,
-      }
-    : {
-        index: false,
-        follow: false,
-      },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const settings = await fetchSiteSettingsMetadata();
+  const title = resolveSiteTitle(settings);
+  const description = resolveSiteDescription(settings);
+  const images = resolveSocialImages(settings?.ogImage, title);
+
+  return {
+    metadataBase,
+    title: {
+      template: `%s | ${SITE_NAME}`,
+      default: title,
+    },
+    description,
+    openGraph: {
+      title,
+      description,
+      locale: 'en_GB',
+      type: 'website',
+      url: buildCanonicalUrl('/'),
+      siteName: SITE_NAME,
+      ...(images ? { images } : {}),
+    },
+    twitter: {
+      card: images ? 'summary_large_image' : 'summary',
+      title,
+      description,
+      ...(images ? { images: images.map(({ url }) => url) } : {}),
+    },
+    alternates: {
+      canonical: '/',
+    },
+    robots: isIndexableSite
+      ? {
+          index: true,
+          follow: true,
+        }
+      : {
+          index: false,
+          follow: false,
+        },
+  };
+}
 
 export default function RootLayout({
   children,
