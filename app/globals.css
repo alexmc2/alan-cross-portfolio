@@ -11,6 +11,7 @@
   --color-text-secondary: #b8b2aa;
   --color-text-muted: #807870;
   --color-accent: #c8a46e;
+  --color-brand: #c8a46e;
   --color-border: rgba(255, 255, 255, 0.06);
   --color-scrollbar-track: #0a0a0a;
   --color-scrollbar-thumb: #333;
@@ -42,6 +43,9 @@
 
   /* Accent — trust blue #00547C */
   --color-accent: #00547C;
+
+  /* Brand */
+  --color-brand: #00547C;
 
   /* Borders */
   --color-border: rgba(16, 23, 38, 0.08);
