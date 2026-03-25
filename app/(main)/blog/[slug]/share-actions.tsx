@@ -9,7 +9,7 @@ type ShareActionsProps = {
 };
 
 const iconButtonClassName =
-  "flex h-11 w-11 items-center justify-center rounded-full border border-border bg-bg-card text-text-secondary shadow-[0_8px_24px_rgba(0,0,0,0.08)] transition-[transform,border-color,background-color,color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:bg-[color:var(--color-accent-soft)] hover:text-accent hover:shadow-[0_14px_30px_rgba(0,0,0,0.16)] focus-visible:outline-none focus-visible:-translate-y-0.5 focus-visible:border-accent/30 focus-visible:bg-[color:var(--color-accent-soft)] focus-visible:text-accent focus-visible:shadow-[0_14px_30px_rgba(0,0,0,0.16)]";
+  "flex h-11 w-11 items-center justify-center rounded-full border border-border bg-bg-card text-text-secondary  transition-[transform,border-color,background-color,color,box-shadow] duration-300 hover:-translate-y-0.5 hover:border-accent/30 hover:bg-[color:var(--color-accent-soft)] hover:text-accent hover:shadow-[0_7px_15px_rgba(0,0,0,0.08)] focus-visible:outline-none focus-visible:-translate-y-0.5 focus-visible:border-accent/30 focus-visible:bg-[color:var(--color-accent-soft)] focus-visible:text-accent focus-visible:shadow-[0_14px_30px_rgba(0,0,0,0.16)]";
 
 function XIcon() {
   return (

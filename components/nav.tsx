@@ -75,20 +75,11 @@ export default function Nav({
           className={`font-display font-bold text-[1.25rem] tracking-[0.08em] uppercase no-underline transition-opacity duration-200 ${
             overlayMode
               ? 'text-[var(--color-hero-text-primary)] opacity-100'
-              : 'text-text-primary'
+              : 'text-[var(--color-brand)]'
           }`}
           onClick={handleBrandClick}
         >
-          Alan{' '}
-          <span
-            className={`font-bold ${
-              overlayMode
-                ? 'text-[var(--color-hero-text-primary)]'
-                : 'text-text-primary'
-            }`}
-          >
-            X
-          </span>
+          Alan X
         </Link>
 
         {/* Desktop nav */}

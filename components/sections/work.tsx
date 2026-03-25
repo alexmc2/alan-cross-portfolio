@@ -202,23 +202,32 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                     </div>
                   )}
 
-                  {/* Hover overlay */}
+                  {/* Mobile tap target */}
                   <a
                     href={destinationHref || '#'}
                     target={destinationHref ? '_blank' : undefined}
                     rel={destinationHref ? 'noopener noreferrer' : undefined}
-                    className="absolute inset-x-0 bottom-0 z-10 flex cursor-pointer flex-col justify-end p-4 opacity-100 transition-opacity duration-400 md:inset-0 md:pointer-events-none md:p-8 md:opacity-0 md:group-hover:pointer-events-auto md:group-hover:opacity-100"
+                    className="absolute inset-0 z-10 md:hidden"
+                    aria-label={item.title}
+                  />
+
+                  {/* Desktop hover overlay */}
+                  <a
+                    href={destinationHref || '#'}
+                    target={destinationHref ? '_blank' : undefined}
+                    rel={destinationHref ? 'noopener noreferrer' : undefined}
+                    className="absolute inset-0 z-10 hidden cursor-pointer flex-col justify-end p-8 pointer-events-none opacity-0 transition-opacity duration-400 group-hover:pointer-events-auto group-hover:opacity-100 md:flex"
                     style={{
                       color: 'var(--color-hero-text-primary)',
                       background:
                         'linear-gradient(to top, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.5) 35%, transparent 100%)',
                     }}
                   >
-                    <h3 className="mb-1 font-display text-base font-semibold drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)] md:mb-2 md:text-2xl">
+                    <h3 className="mb-2 font-display text-2xl font-semibold drop-shadow-[0_1px_3px_rgba(0,0,0,0.8)]">
                       {item.title}
                     </h3>
                     <p
-                      className="line-clamp-2 text-xs tracking-[0.03em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)] md:text-base"
+                      className="line-clamp-2 text-base tracking-[0.03em] drop-shadow-[0_1px_2px_rgba(0,0,0,0.8)]"
                       style={{ color: 'var(--color-hero-text-secondary)' }}
                     >
                       {item.description
@@ -228,11 +237,30 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                   </a>
                 </div>
 
+                {/* Mobile title + description (below video) */}
+                <a
+                  href={destinationHref || '#'}
+                  target={destinationHref ? '_blank' : undefined}
+                  rel={destinationHref ? 'noopener noreferrer' : undefined}
+                  className="mt-3 block no-underline md:hidden"
+                >
+                  <h3 className="font-display text-sm font-semibold text-text-primary">
+                    {item.title}
+                  </h3>
+                  {(item.description || item.category || item.year) && (
+                    <p className="mt-1 line-clamp-2 text-xs tracking-[0.03em] text-text-secondary">
+                      {item.description
+                        ? item.description
+                        : `${item.category || ''}${item.year ? ` \u2014 ${item.year}` : ''}`}
+                    </p>
+                  )}
+                </a>
+
                 {/* Meta row: pill | title | divider | index */}
-                <div className="mt-5 flex items-center gap-4 px-1 max-[900px]:justify-between max-[900px]:gap-3">
+                <div className="mt-5 flex items-center gap-4 max-[900px]:px-0 px-1 max-[900px]:justify-between max-[900px]:gap-3">
                   {item.category && (
                     <span
-                      className="inline-block shrink-0 whitespace-nowrap rounded-full border px-4 py-1.5 text-[11px] font-medium tracking-[2px] uppercase text-accent"
+                      className="inline-block shrink-0 whitespace-nowrap rounded-full border px-2.5 py-0.5 text-[8px] font-medium tracking-[1px] uppercase text-accent sm:px-4 sm:py-1.5 sm:text-[11px] sm:tracking-[2px]"
                       style={{
                         borderColor: 'var(--color-accent-soft)',
                         backgroundColor: 'var(--color-accent-soft)',
