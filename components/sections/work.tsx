@@ -153,7 +153,7 @@ export default function Work({ items }: { items: PortfolioItem[] }) {
                 }`}
               >
                 <div
-                  className="group relative w-full overflow-hidden"
+                  className="group relative w-full rounded overflow-hidden bg-bg-card"
                   style={{ aspectRatio }}
                 >
                   {mediaSrc ? (
