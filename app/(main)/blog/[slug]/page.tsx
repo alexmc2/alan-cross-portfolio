@@ -123,6 +123,10 @@ function getPostCategories(post: Post) {
   return Array.from(categories.values());
 }
 
+function shouldOpenImageLinkInNewTab(href: string): boolean {
+  return /^https?:\/\//u.test(href);
+}
+
 export default async function PostPage(props: {
   params: Promise<{ slug: string }>;
 }) {
@@ -188,23 +192,46 @@ export default async function PostPage(props: {
 
           {/* Main image */}
           {post.mainImage?.asset && (
-            <div
-              className="aspect-video relative overflow-hidden mb-12 opacity-0 animate-fade-up"
-              style={{ animationDelay: '200ms' }}
-            >
-              <Image
-                src={urlFor(post.mainImage).width(1200).height(675).url()}
-                alt={post.mainImage.alt || post.title}
-                fill
-                className="object-cover"
-                sizes="800px"
-                priority
-                placeholder={
-                  post.mainImage.asset.metadata?.lqip ? "blur" : undefined
-                }
-                blurDataURL={post.mainImage.asset.metadata?.lqip}
-              />
-            </div>
+            (() => {
+              const imageNode = (
+                <div
+                  className="aspect-video relative overflow-hidden mb-12 opacity-0 animate-fade-up"
+                  style={{ animationDelay: '200ms' }}
+                >
+                  <Image
+                    src={urlFor(post.mainImage).width(1200).height(675).url()}
+                    alt={post.mainImage.alt || post.title}
+                    fill
+                    className="object-cover"
+                    sizes="800px"
+                    priority
+                    placeholder={
+                      post.mainImage.asset.metadata?.lqip ? "blur" : undefined
+                    }
+                    blurDataURL={post.mainImage.asset.metadata?.lqip}
+                  />
+                </div>
+              );
+
+              if (!post.mainImage.linkUrl) {
+                return imageNode;
+              }
+
+              const openInNewTab = shouldOpenImageLinkInNewTab(
+                post.mainImage.linkUrl
+              );
+
+              return (
+                <a
+                  href={post.mainImage.linkUrl}
+                  className="block"
+                  target={openInNewTab ? "_blank" : undefined}
+                  rel={openInNewTab ? "noreferrer noopener" : undefined}
+                >
+                  {imageNode}
+                </a>
+              );
+            })()
           )}
 
           {metaRow}

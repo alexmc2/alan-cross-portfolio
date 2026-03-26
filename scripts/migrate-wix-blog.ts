@@ -176,6 +176,7 @@ type ScrapedPost = {
   metaDescription: string;
   featuredImageUrl?: string;
   featuredImageAlt?: string;
+  featuredImageLinkUrl?: string;
   categories: string[];
   author?: string;
   readTime?: string;
@@ -197,6 +198,7 @@ type SanityImageField = {
     _ref: string;
   };
   alt?: string;
+  linkUrl?: string;
 };
 
 type UploadResult = {
@@ -336,6 +338,11 @@ async function main() {
             summary
           )
         : undefined;
+
+      if (mainImage && scrapedPost.featuredImageLinkUrl) {
+        mainImage.linkUrl = scrapedPost.featuredImageLinkUrl;
+      }
+
       const ogImage = mainImage
         ? {
             _type: "image" as const,
@@ -373,6 +380,9 @@ async function main() {
       console.log(`  Title: ${scrapedPost.title}`);
       console.log(`  Slug: ${scrapedPost.slug}`);
       console.log(`  Published At: ${scrapedPost.publishedAt}`);
+      console.log(
+        `  Featured Link: ${scrapedPost.featuredImageLinkUrl ?? "(none)"}`
+      );
       console.log(
         `  Wix Categories: ${
           scrapedPost.categories.length > 0
@@ -860,6 +870,11 @@ async function scrapePost(feedEntry: FeedEntry): Promise<ScrapedPost> {
     normalizeString($('meta[property="og:image:alt"]').attr("content")),
     title,
   ]);
+  const featuredImageLinkUrl = extractLeadingFeaturedImageLink(
+    bodyHtml,
+    feedEntry.url,
+    featuredImageUrl
+  );
   const metaDescription =
     firstNonEmptyString([
       normalizeString($('meta[name="description"]').attr("content")),
@@ -881,6 +896,7 @@ async function scrapePost(feedEntry: FeedEntry): Promise<ScrapedPost> {
     metaDescription,
     featuredImageUrl,
     featuredImageAlt,
+    featuredImageLinkUrl,
     categories,
     author: firstNonEmptyString([
       normalizeWhitespace($('[data-hook="user-name"]').first().text()),
@@ -1021,21 +1037,146 @@ function removeLeadingFeaturedImageDuplicate(
     return;
   }
 
-  const leadingElements = Array.from(body.children) as HTMLElement[];
+  const duplicateElement = findLeadingDuplicateImageElement(
+    body,
+    sourceUrl,
+    featuredImageKey
+  );
 
-  for (const element of leadingElements) {
-    if (isElementEmpty(element)) {
-      element.remove();
-      continue;
-    }
+  duplicateElement?.remove();
+}
 
-    if (isLeadingDuplicateImageElement(element, sourceUrl, featuredImageKey)) {
-      element.remove();
-      continue;
-    }
+function extractLeadingFeaturedImageLink(
+  bodyHtml: string,
+  sourceUrl: string,
+  featuredImageUrl: string | undefined
+): string | undefined {
+  const featuredImageKey = getImageIdentity(featuredImageUrl, sourceUrl);
 
-    break;
+  if (!featuredImageKey) {
+    return undefined;
   }
+
+  const dom = new JSDOM(`<body>${bodyHtml}</body>`);
+  const body = dom.window.document.body;
+  const duplicateElement = findLeadingDuplicateImageElement(
+    body,
+    sourceUrl,
+    featuredImageKey
+  );
+  const directLink = extractLinkFromImageElement(duplicateElement, sourceUrl);
+
+  if (directLink) {
+    return directLink;
+  }
+
+  const matchingElement = findDuplicateImageElementAnywhere(
+    body,
+    sourceUrl,
+    featuredImageKey
+  );
+
+  return extractLinkFromImageElement(matchingElement, sourceUrl);
+}
+
+function findLeadingDuplicateImageElement(
+  root: ParentNode,
+  sourceUrl: string,
+  featuredImageKey: string
+): HTMLElement | undefined {
+  const leadingContentElement = findLeadingContentElement(root);
+
+  if (!leadingContentElement) {
+    return undefined;
+  }
+
+  return isLeadingDuplicateImageElement(
+    leadingContentElement,
+    sourceUrl,
+    featuredImageKey
+  )
+    ? leadingContentElement
+    : undefined;
+}
+
+function findDuplicateImageElementAnywhere(
+  root: ParentNode,
+  sourceUrl: string,
+  featuredImageKey: string
+): HTMLElement | undefined {
+  const figureMatch = Array.from(root.querySelectorAll("figure")).find((element) =>
+    isLeadingDuplicateImageElement(element as HTMLElement, sourceUrl, featuredImageKey)
+  ) as HTMLElement | undefined;
+
+  if (figureMatch) {
+    return figureMatch;
+  }
+
+  const standaloneImageMatch = Array.from(root.querySelectorAll("img"))
+    .filter((element) => !element.closest("figure"))
+    .find((element) =>
+      isLeadingDuplicateImageElement(
+        element as HTMLElement,
+        sourceUrl,
+        featuredImageKey
+      )
+    ) as HTMLElement | undefined;
+
+  if (standaloneImageMatch) {
+    return standaloneImageMatch;
+  }
+
+  return Array.from(root.querySelectorAll("div, p")).find((element) =>
+    isLeadingDuplicateImageElement(element as HTMLElement, sourceUrl, featuredImageKey)
+  ) as HTMLElement | undefined;
+}
+
+function extractLinkFromImageElement(
+  element: HTMLElement | undefined,
+  sourceUrl: string
+): string | undefined {
+  if (!element) {
+    return undefined;
+  }
+
+  const image =
+    element.tagName.toLowerCase() === "img"
+      ? element
+      : element.querySelector("img");
+  const anchor = image?.closest("a") ?? element.querySelector("a[href]");
+
+  return resolveUrl(normalizeString(anchor?.getAttribute("href")), sourceUrl);
+}
+
+function findLeadingContentElement(root: ParentNode): HTMLElement | undefined {
+  let currentRoot = root;
+
+  while (true) {
+    const firstMeaningfulChild = Array.from(currentRoot.children).find((child) => {
+      if (!isElementNode(child)) {
+        return false;
+      }
+
+      return !isElementEmpty(child);
+    }) as HTMLElement | undefined;
+
+    if (!firstMeaningfulChild) {
+      return undefined;
+    }
+
+    if (canDescendIntoLeadingContent(firstMeaningfulChild)) {
+      currentRoot = firstMeaningfulChild;
+      continue;
+    }
+
+    return firstMeaningfulChild;
+  }
+}
+
+function canDescendIntoLeadingContent(element: HTMLElement): boolean {
+  return ["div", "section", "article", "main"].includes(
+    element.tagName.toLowerCase()
+  );
 }
 
 function isLeadingDuplicateImageElement(
@@ -1086,7 +1227,7 @@ function isLeadingDuplicateImageElement(
   );
 }
 
-function isElementEmpty(element: HTMLElement): boolean {
+function isElementEmpty(element: Element): boolean {
   const hasMedia = Boolean(
     element.querySelector("img, iframe, video, oembed, figure")
   );
