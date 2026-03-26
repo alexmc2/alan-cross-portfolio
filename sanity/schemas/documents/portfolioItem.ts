@@ -40,8 +40,8 @@ export default defineType({
     }),
     defineField({
       name: 'vimeoUrl',
-      title: 'Vimeo URL (Legacy)',
-      description: 'Existing Vimeo-only field kept for backward compatibility',
+      title: 'Vimeo URL',
+      description: 'Paste a Vimeo watch or player URL',
       type: 'url',
     }),
     defineField({

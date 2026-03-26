@@ -1,12 +1,21 @@
 'use client';
 
 import Image from 'next/image';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { onIdleChange, isPageIdle } from '@/lib/media-lifecycle';
 
-const FRAME_READY_DELAY_MS = 2500;
+const REVEAL_DELAY_MS = 250;
 const UNLOAD_DELAY_MS = 8000;
 const FRAME_ROOT_MARGIN = '300px 0px';
+
+type VimeoPlayerLike = {
+  destroy: () => Promise<void>;
+  off: (event: string, callback: () => void) => void;
+  on: (event: string, callback: () => void) => void;
+  pause: () => Promise<void>;
+  play: () => Promise<void>;
+  ready: () => Promise<void>;
+};
 
 type DeferredMediaFrameProps = {
   mediaType?: 'iframe' | 'video';
@@ -32,24 +41,46 @@ export default function DeferredMediaFrame({
   displayMode = 'contain',
 }: DeferredMediaFrameProps) {
   const containerRef = useRef<HTMLDivElement | null>(null);
+  const iframeRef = useRef<HTMLIFrameElement | null>(null);
   const videoRef = useRef<HTMLVideoElement | null>(null);
+  const vimeoPlayerRef = useRef<VimeoPlayerLike | null>(null);
   const [shouldLoad, setShouldLoad] = useState(false);
-  const [isFrameReady, setIsFrameReady] = useState(false);
+  const [isMediaVisible, setIsMediaVisible] = useState(false);
   const unloadTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const readyTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const revealTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const isInViewRef = useRef(false);
 
+  const isVimeoEmbed =
+    mediaType === 'iframe' && src.includes('player.vimeo.com');
+
+  const clearRevealTimer = useCallback(() => {
+    if (revealTimerRef.current) {
+      clearTimeout(revealTimerRef.current);
+      revealTimerRef.current = null;
+    }
+  }, []);
+
+  const hideMedia = useCallback(() => {
+    clearRevealTimer();
+    setIsMediaVisible(false);
+  }, [clearRevealTimer]);
+
+  const scheduleReveal = useCallback(() => {
+    clearRevealTimer();
+    revealTimerRef.current = setTimeout(() => {
+      setIsMediaVisible(true);
+      revealTimerRef.current = null;
+    }, REVEAL_DELAY_MS);
+  }, [clearRevealTimer]);
+
+  // Intersection + idle lifecycle
   useEffect(() => {
     const node = containerRef.current;
     if (!node) return;
 
     const unload = () => {
-      if (readyTimerRef.current) {
-        clearTimeout(readyTimerRef.current);
-        readyTimerRef.current = null;
-      }
+      hideMedia();
       setShouldLoad(false);
-      setIsFrameReady(false);
     };
 
     const observer = new IntersectionObserver(
@@ -64,16 +95,14 @@ export default function DeferredMediaFrame({
             if (!isPageIdle()) {
               setShouldLoad(true);
             }
-            // Resume a paused video when it re-enters the viewport
             videoRef.current?.play().catch(() => {});
           } else {
             isInViewRef.current = false;
-            // Immediately pause video when offscreen
             videoRef.current?.pause();
+            hideMedia();
             if (unloadTimerRef.current) {
               clearTimeout(unloadTimerRef.current);
             }
-            // Grace period before unloading to avoid thrash on quick scrolling
             unloadTimerRef.current = setTimeout(() => {
               unload();
               unloadTimerRef.current = null;
@@ -86,7 +115,6 @@ export default function DeferredMediaFrame({
 
     observer.observe(node);
 
-    // Idle detection — unload when idle, reload when active
     const unsubIdle = onIdleChange((idle) => {
       if (idle) {
         videoRef.current?.pause();
@@ -104,12 +132,67 @@ export default function DeferredMediaFrame({
         clearTimeout(unloadTimerRef.current);
         unloadTimerRef.current = null;
       }
-      if (readyTimerRef.current) {
-        clearTimeout(readyTimerRef.current);
-        readyTimerRef.current = null;
-      }
+      clearRevealTimer();
     };
-  }, []);
+  }, [clearRevealTimer, hideMedia]);
+
+  // Vimeo Player SDK — reveal only when actually playing (mirrors hero-video)
+  useEffect(() => {
+    if (!shouldLoad || !isVimeoEmbed) return;
+
+    const iframeNode = iframeRef.current;
+    if (!iframeNode) return;
+
+    let cancelled = false;
+    let player: VimeoPlayerLike | null = null;
+
+    const handlePlaying = () => {
+      scheduleReveal();
+    };
+
+    const handleBufferStart = () => {
+      hideMedia();
+    };
+
+    const handlePause = () => {
+      hideMedia();
+    };
+
+    void (async () => {
+      try {
+        const { default: VimeoPlayer } = await import('@vimeo/player');
+        if (cancelled || iframeNode !== iframeRef.current) return;
+
+        player = new VimeoPlayer(iframeNode) as VimeoPlayerLike;
+        vimeoPlayerRef.current = player;
+
+        player.on('playing', handlePlaying);
+        player.on('bufferstart', handleBufferStart);
+        player.on('pause', handlePause);
+
+        await player.ready();
+        const playPromise = player.play();
+        playPromise?.catch(() => {});
+      } catch {
+        hideMedia();
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+
+      if (vimeoPlayerRef.current === player) {
+        vimeoPlayerRef.current = null;
+      }
+
+      if (!player) return;
+
+      player.off('playing', handlePlaying);
+      player.off('bufferstart', handleBufferStart);
+      player.off('pause', handlePause);
+      player.destroy().catch(() => {});
+    };
+  }, [hideMedia, isVimeoEmbed, scheduleReveal, shouldLoad]);
 
   const triggerLoad = () => {
     if (unloadTimerRef.current) {
@@ -119,19 +202,8 @@ export default function DeferredMediaFrame({
     setShouldLoad(true);
   };
 
-  const handleFrameLoad = () => {
-    if (readyTimerRef.current) {
-      clearTimeout(readyTimerRef.current);
-    }
-    // Keep poster a touch longer to avoid showing Vimeo's loading spinner.
-    readyTimerRef.current = setTimeout(() => {
-      setIsFrameReady(true);
-      readyTimerRef.current = null;
-    }, FRAME_READY_DELAY_MS);
-  };
-
-  const showPoster = Boolean(posterSrc) && (!shouldLoad || !isFrameReady);
-  const showFallback = !posterSrc && (!shouldLoad || !isFrameReady);
+  const showPoster = Boolean(posterSrc) && !isMediaVisible;
+  const showFallback = !posterSrc && !isMediaVisible;
   const mediaFitClass =
     displayMode === 'cover' ? 'object-cover' : 'object-contain';
   const containInsetClass =
@@ -183,19 +255,25 @@ export default function DeferredMediaFrame({
             playsInline
             preload="metadata"
             className={`absolute pointer-events-none ${mediaFitClass} ${containInsetClass}`}
-            onLoadedData={handleFrameLoad}
+            onPlaying={scheduleReveal}
+            onWaiting={hideMedia}
           >
             <source src={src} {...(mimeType ? { type: mimeType } : {})} />
           </video>
         ) : (
           <iframe
+            ref={iframeRef}
             src={src}
             className={iframeClassName}
             allow="autoplay; fullscreen; encrypted-media"
             allowFullScreen
             loading="eager"
             title={title}
-            onLoad={handleFrameLoad}
+            onLoad={() => {
+              if (!isVimeoEmbed) {
+                scheduleReveal();
+              }
+            }}
           />
         )
       ) : null}
