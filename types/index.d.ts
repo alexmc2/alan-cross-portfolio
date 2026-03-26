@@ -179,4 +179,5 @@ export type SanityImage = {
     right: number;
   };
   alt?: string;
+  linkUrl?: string;
 };

@@ -55,6 +55,11 @@ export default defineType({
           type: "string",
           title: "Alternative Text",
         },
+        {
+          name: "linkUrl",
+          type: "url",
+          title: "Image Link URL",
+        },
       ],
     }),
     defineField({
