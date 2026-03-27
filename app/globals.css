@@ -235,3 +235,20 @@
 *::-webkit-scrollbar-thumb:hover {
   background-color: var(--color-scrollbar-thumb-hover);
 }
+
+/* Blog filter horizontal scroll — theme-aware scrollbar */
+.blog-filter-scroll {
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-accent) transparent;
+}
+.blog-filter-scroll::-webkit-scrollbar {
+  height: 3px;
+}
+.blog-filter-scroll::-webkit-scrollbar-track {
+  background: transparent;
+}
+.blog-filter-scroll::-webkit-scrollbar-thumb {
+  background-color: var(--color-accent);
+  border-radius: 9999px;
+  border: none;
+}
