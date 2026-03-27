@@ -124,7 +124,7 @@ export default async function BlogPage({
           {categories.length > 0 && (
             <>
               <div
-                className="flex gap-3 mb-12 overflow-x-auto pb-2 md:hidden opacity-0 animate-fade-up"
+                className="flex gap-3 mb-12 overflow-x-auto pb-2 md:hidden opacity-0 animate-fade-up blog-filter-scroll"
                 style={{ animationDelay: '120ms' }}
               >
                 <Link

@@ -189,6 +189,7 @@ export default function Nav({
             <ThemeToggle
               showLabel
               className="text-[1.05rem] font-normal tracking-[0.15em] uppercase"
+              onToggle={() => setMobileOpen(false)}
             />
           </li>
         </ul>

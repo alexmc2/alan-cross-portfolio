@@ -8,6 +8,7 @@ type ThemeToggleProps = {
   showLabel?: boolean;
   className?: string;
   tone?: 'theme' | 'overlay';
+  onToggle?: () => void;
 };
 
 function SunIcon() {
@@ -52,6 +53,7 @@ export default function ThemeToggle({
   showLabel = false,
   className,
   tone = 'theme',
+  onToggle,
 }: ThemeToggleProps) {
   const { theme, setTheme } = useTheme();
   const hasHydrated = useSyncExternalStore(
@@ -71,7 +73,7 @@ export default function ThemeToggle({
       type="button"
       aria-label={ariaLabel}
       title={ariaLabel}
-      onClick={() => setTheme(nextTheme)}
+      onClick={() => { setTheme(nextTheme); onToggle?.(); }}
       className={cn(
         'inline-flex shrink-0 items-center p-0 leading-none transition-colors duration-200 focus-visible:outline-none',
         tone === 'overlay'
