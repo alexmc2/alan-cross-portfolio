@@ -2,9 +2,11 @@ import { fetchSanityPosts, fetchSiteSettingsMetadata } from '@/sanity/lib/fetch'
 import { urlFor } from '@/sanity/lib/image';
 import Image from 'next/image';
 import Link from 'next/link';
+import { Suspense } from 'react';
 import Nav from '@/components/nav';
 import SiteFooter from '@/components/sections/site-footer';
 import BlogCategoryFilter from './category-filter';
+import BlogSearch from './blog-search';
 import type { Metadata } from 'next';
 import type { Post } from '@/types';
 import { buildMetadata } from '@/lib/metadata';
@@ -31,10 +33,15 @@ function formatDate(dateString: string) {
   });
 }
 
-function buildHref(params: { category?: string; page?: number }) {
+function buildHref(params: {
+  category?: string;
+  page?: number;
+  search?: string;
+}) {
   const sp = new URLSearchParams();
   if (params.category) sp.set('category', params.category);
   if (params.page && params.page > 1) sp.set('page', String(params.page));
+  if (params.search) sp.set('search', params.search);
   const qs = sp.toString();
   return qs ? `/blog?${qs}` : '/blog';
 }
@@ -65,9 +72,9 @@ function compareCategoryUsage(
 export default async function BlogPage({
   searchParams,
 }: {
-  searchParams: Promise<{ category?: string; page?: string }>;
+  searchParams: Promise<{ category?: string; page?: string; search?: string }>;
 }) {
-  const { category, page } = await searchParams;
+  const { category, page, search } = await searchParams;
   const allPosts = ((await fetchSanityPosts()) || []) as Post[];
   const categoryCounts = new Map<string, number>();
 
@@ -91,13 +98,23 @@ export default async function BlogPage({
   const isMoreInitiallyOpen = extraCategories.includes(category || '');
 
   // Filter by category
-  const filteredPosts = category
+  const categoryPosts = category
     ? allPosts.filter((post) =>
         getPostCategories(post).some(
           (postCategory) => postCategory.title === category
         )
       )
     : allPosts;
+
+  // Filter by search
+  const searchTerm = search?.trim().toLowerCase();
+  const filteredPosts = searchTerm
+    ? categoryPosts.filter(
+        (post) =>
+          post.title?.toLowerCase().includes(searchTerm) ||
+          post.excerpt?.toLowerCase().includes(searchTerm)
+      )
+    : categoryPosts;
 
   // Pagination
   const currentPage = Math.max(1, parseInt(page || '1', 10) || 1);
@@ -161,16 +178,21 @@ export default async function BlogPage({
             </>
           )}
 
-          {totalPages > 1 && (
-            <div
-              className="flex justify-end mb-6 opacity-0 animate-fade-up"
-              style={{ animationDelay: '200ms' }}
-            >
+          <div
+            className="flex items-center justify-between gap-4 mb-6 opacity-0 animate-fade-up"
+            style={{ animationDelay: '200ms' }}
+          >
+            <div className="w-56 max-md:w-44">
+              <Suspense>
+                <BlogSearch />
+              </Suspense>
+            </div>
+            {totalPages > 1 && (
               <span className="text-[0.75rem] tracking-[0.12em] uppercase text-text-secondary whitespace-nowrap">
                 Page {safePage} of {totalPages}
               </span>
-            </div>
-          )}
+            )}
+          </div>
 
           {paginatedPosts.length === 0 ? (
             <p
@@ -266,7 +288,7 @@ export default async function BlogPage({
               {/* Previous */}
               {safePage > 1 ? (
                 <Link
-                  href={buildHref({ category, page: safePage - 1 })}
+                  href={buildHref({ category, page: safePage - 1, search })}
                   className="text-[0.75rem] w-9 h-9 flex items-center justify-center border border-accent/30 text-text-secondary no-underline transition-colors duration-300 hover:border-accent hover:text-accent"
                   aria-label="Previous page"
                 >
@@ -304,7 +326,7 @@ export default async function BlogPage({
                   ) : (
                     <Link
                       key={p}
-                      href={buildHref({ category, page: p })}
+                      href={buildHref({ category, page: p, search })}
                       aria-current={p === safePage ? 'page' : undefined}
                       className={`text-[0.75rem] w-9 h-9 flex items-center justify-center border no-underline transition-colors duration-300 ${
                         p === safePage
@@ -321,7 +343,7 @@ export default async function BlogPage({
               {/* Next */}
               {safePage < totalPages ? (
                 <Link
-                  href={buildHref({ category, page: safePage + 1 })}
+                  href={buildHref({ category, page: safePage + 1, search })}
                   className="text-[0.75rem] w-9 h-9 flex items-center justify-center border border-accent/30 text-text-secondary no-underline transition-colors duration-300 hover:border-accent hover:text-accent"
                   aria-label="Next page"
                 >
