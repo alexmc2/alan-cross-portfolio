@@ -5,6 +5,7 @@ import Link from "next/link";
 import { YouTubeEmbed } from "@next/third-parties/google";
 import { Highlight, themes } from "prism-react-renderer";
 import { CopyButton } from "@/components/ui/copy-button";
+import { normalizePortableTextWhitespace } from "@/lib/portable-text-whitespace";
 
 type PortableTextSpacing = "default" | "none";
 type PortableTextValue = PortableTextProps["value"];
@@ -28,7 +29,9 @@ function normalizePortableTextValue(value: PortableTextValue): PortableTextValue
     return value;
   }
 
-  return value.filter((block) => !isWhitespaceOnlyPortableTextBlock(block));
+  return normalizePortableTextWhitespace(
+    value.filter((block) => !isWhitespaceOnlyPortableTextBlock(block))
+  );
 }
 
 const getSpacingValue = (spacing: PortableTextSpacing) =>
