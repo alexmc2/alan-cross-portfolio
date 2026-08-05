@@ -9,6 +9,7 @@ import { codeInput } from "@sanity/code-input";
 import { apiVersion, dataset, projectId } from "./sanity/env";
 import { schema } from "./sanity/schema";
 import { structure } from "./sanity/structure";
+import { PortableTextWhitespacePlugins } from "./sanity/plugins/portable-text-whitespace";
 
 // Define the actions that should be available for singleton documents
 const singletonActions = new Set([
@@ -38,6 +39,13 @@ export default defineConfig({
       singletonTypes.has(context.schemaType)
         ? input.filter(({ action }) => action && singletonActions.has(action))
         : input,
+  },
+  form: {
+    components: {
+      portableText: {
+        plugins: PortableTextWhitespacePlugins,
+      },
+    },
   },
   plugins: [
     structureTool({ structure }),

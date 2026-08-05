@@ -10,6 +10,7 @@ import * as dotenv from "dotenv";
 import { JSDOM } from "jsdom";
 import { createHash } from "node:crypto";
 import path from "node:path";
+import { normalizePortableTextWhitespace } from "../lib/portable-text-whitespace";
 
 dotenv.config({ path: path.resolve(process.cwd(), ".env.local") });
 
@@ -1375,7 +1376,11 @@ function createImagePlaceholder(
 function normalizeImportedPortableText(
   blocks: PortableTextNode[]
 ): PortableTextNode[] {
-  return normalizeLinkMarkDefs(removeWhitespaceOnlyPortableTextBlocks(blocks));
+  return normalizeLinkMarkDefs(
+    normalizePortableTextWhitespace(
+      removeWhitespaceOnlyPortableTextBlocks(blocks)
+    )
+  );
 }
 
 function removeWhitespaceOnlyPortableTextBlocks(

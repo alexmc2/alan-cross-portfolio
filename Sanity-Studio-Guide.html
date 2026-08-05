@@ -1,0 +1,695 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <style>
+      :root {
+        --ink: #1f2430;
+        --body: #34384180;
+        --text: #343841;
+        --muted: #6b7280;
+        --accent: #a87f3d;
+        --accent-deep: #8a6730;
+        --tint: #faf6ee;
+        --tint-border: #ecdcc2;
+        --chip-bg: #eef1f5;
+        --chip-text: #2b3340;
+        --chip-border: #d9dee6;
+        --line: #e7e3db;
+      }
+
+      @page {
+        size: A4;
+        margin: 18mm 16mm 18mm 16mm;
+        @bottom-center {
+          content: 'alanxai.com  ·  Studio guide';
+          font-family: Helvetica, Arial, sans-serif;
+          font-size: 8.5px;
+          color: #9aa0a8;
+          letter-spacing: 0.06em;
+        }
+        @bottom-right {
+          content: counter(page);
+          font-family: Helvetica, Arial, sans-serif;
+          font-size: 8.5px;
+          color: #9aa0a8;
+        }
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        font-family: Helvetica, Arial, sans-serif;
+        color: var(--text);
+        font-size: 11px;
+        line-height: 1.6;
+        margin: 0;
+      }
+
+      /* Cover header */
+      .masthead {
+        border-bottom: 2px solid var(--accent);
+        padding-bottom: 14px;
+        margin-bottom: 22px;
+      }
+      .eyebrow {
+        font-size: 9px;
+        letter-spacing: 0.28em;
+        text-transform: uppercase;
+        color: var(--accent-deep);
+        font-weight: 700;
+        margin-bottom: 8px;
+      }
+      h1 {
+        font-size: 27px;
+        line-height: 1.12;
+        color: var(--ink);
+        margin: 0 0 6px 0;
+        font-weight: 700;
+        letter-spacing: -0.01em;
+      }
+      .subtitle {
+        font-size: 12.5px;
+        color: var(--muted);
+        margin: 0;
+      }
+
+      .lead {
+        font-size: 11.5px;
+        color: var(--text);
+        margin: 0 0 14px 0;
+      }
+
+      /* URL pill */
+      .urlbox {
+        display: block;
+        background: var(--ink);
+        color: #fff;
+        border-radius: 8px;
+        padding: 11px 16px;
+        margin: 14px 0;
+      }
+      .urlbox .lbl {
+        font-size: 8.5px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: #c9b78f;
+        display: block;
+        margin-bottom: 2px;
+      }
+      .urlbox .addr {
+        font-size: 15px;
+        font-weight: 700;
+        letter-spacing: 0.01em;
+      }
+
+      h2 {
+        font-size: 16px;
+        color: var(--ink);
+        margin: 26px 0 4px 0;
+        font-weight: 700;
+        padding-bottom: 6px;
+        border-bottom: 1px solid var(--line);
+      }
+      h2 .num {
+        color: var(--accent);
+        margin-right: 8px;
+      }
+      .sectionintro {
+        color: var(--muted);
+        margin: 0 0 14px 0;
+        font-size: 11px;
+      }
+
+      h3 {
+        font-size: 12px;
+        color: var(--ink);
+        margin: 18px 0 8px 0;
+        font-weight: 700;
+      }
+
+      /* Callout / tip box */
+      .callout {
+        background: var(--tint);
+        border: 1px solid var(--tint-border);
+        border-left: 3px solid var(--accent);
+        border-radius: 6px;
+        padding: 11px 14px;
+        margin: 14px 0;
+        font-size: 10.5px;
+      }
+      .callout .tiptag {
+        font-weight: 700;
+        color: var(--accent-deep);
+        letter-spacing: 0.04em;
+      }
+
+      /* The golden-rule highlight box */
+      .ruleblock {
+        background: #fbf3e6;
+        border: 1px solid #e9d3a8;
+        border-radius: 8px;
+        padding: 14px 16px;
+        margin: 16px 0;
+      }
+      .ruleblock h3 {
+        margin-top: 0;
+      }
+
+      /* Steps */
+      .step {
+        display: flex;
+        gap: 11px;
+        margin: 9px 0;
+        break-inside: avoid;
+      }
+      .step-num {
+        flex: 0 0 24px;
+        width: 24px;
+        height: 24px;
+        border-radius: 50%;
+        background: var(--accent);
+        color: #fff;
+        text-align: center;
+        line-height: 24px;
+        font-weight: 700;
+        font-size: 12px;
+      }
+      .step-body {
+        flex: 1;
+        padding-top: 1px;
+      }
+      .step-body .what {
+        font-weight: 700;
+        color: var(--ink);
+      }
+      .step-body .sub {
+        margin-top: 3px;
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .step-body ul {
+        margin: 4px 0 0 0;
+        padding-left: 16px;
+        color: var(--muted);
+        font-size: 10px;
+      }
+      .step-body ul li {
+        margin: 2px 0;
+      }
+      .step-body {
+        flex: 1;
+        padding-top: 1px;
+        margin-left: 11px;
+      }
+
+      /* UI label chip */
+      .key {
+        display: inline-block;
+        background: var(--chip-bg);
+        border: 1px solid var(--chip-border);
+        border-radius: 4px;
+        padding: 0 5px;
+        font-size: 10px;
+        font-weight: 700;
+        color: var(--chip-text);
+        line-height: 1.5;
+        white-space: nowrap;
+      }
+      .key.go {
+        background: #eaf2ed;
+        border-color: #cfe2d6;
+        color: #2f6b46;
+      }
+      .key.pub {
+        background: #e8eef6;
+        border-color: #cbdaee;
+        color: #1f5390;
+      }
+
+      /* layout key list */
+      .layoutlist {
+        margin: 8px 0;
+        padding: 0;
+        list-style: none;
+      }
+      .layoutlist li {
+        margin: 6px 0;
+        padding-left: 0;
+      }
+      .layoutlist .col {
+        font-weight: 700;
+        color: var(--accent-deep);
+      }
+
+      /* FAQ */
+      .faq {
+        margin: 6px 0;
+      }
+      .faq dt {
+        font-weight: 700;
+        color: var(--ink);
+        margin-top: 9px;
+      }
+      .faq dd {
+        margin: 1px 0 0 0;
+        color: var(--text);
+        font-size: 10.5px;
+      }
+
+      .signoff {
+        margin-top: 26px;
+        padding-top: 12px;
+        border-top: 1px solid var(--line);
+        color: var(--muted);
+        font-size: 10.5px;
+      }
+
+      .avoidbreak {
+        break-inside: avoid;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="masthead">
+      <h1>Adding Videos &amp; Blog Posts</h1>
+      <p class="subtitle">Guide for Alan</p>
+    </div>
+
+    <p class="lead">
+      Your website has a built-in &ldquo;control room&rdquo; called the
+      <strong>Studio</strong>. It&rsquo;s where you add new videos, write blog
+      posts, and update content. This guide walks you through it one step at a
+      time.
+    </p>
+
+    <div class="urlbox">
+      <span class="lbl">Open the Studio here</span>
+      <span class="addr">www.alanxai.com/studio</span>
+    </div>
+    <p class="sectionintro" style="margin-top: -6px">
+      Sign in with your usual details. It&rsquo;s worth bookmarking this page so
+      it&rsquo;s easy to find next time.
+    </p>
+
+    <div class="ruleblock avoidbreak">
+      <h3>The golden rule: Draft vs Published</h3>
+      <p style="margin: 0">
+        Nothing you type appears on the live website until you press
+        <span class="key pub">Publish</span>. Until then, your work is saved
+        privately as a <strong>Draft</strong> that only you can see. So feel
+        free to experiment - the live site stays exactly as it is until
+        <em>you</em> decide it&rsquo;s ready. When you&rsquo;re happy, press the
+        blue <span class="key pub">Publish</span> button at the bottom-right.
+      </p>
+    </div>
+
+    <h3>How the screen is laid out</h3>
+    <p style="margin: 0 0 4px 0">
+      When you open the Studio you&rsquo;ll see three columns, left to right:
+    </p>
+    <ul class="layoutlist">
+      <li>
+        <span class="col">Left (&ldquo;Content&rdquo;)</span> - the main areas
+        of your site: <strong>Portfolio</strong>, <strong>Blog</strong>,
+        Services, and so on. Pick one to start.
+      </li>
+      <li>
+        <span class="col">Middle</span> - the list of items inside whatever you
+        picked (all your videos, or all your blog posts).
+      </li>
+      <li>
+        <span class="col">Right</span> - the form where you actually type and
+        edit. This is where the work happens.
+      </li>
+    </ul>
+    <div class="callout">
+      <span class="tiptag">Spotting what&rsquo;s live:</span> next to each item
+      is a small dot. A <strong>green dot</strong> means it&rsquo;s live on the
+      site. A <strong>grey dot</strong> means it&rsquo;s a draft, or has changes
+      you haven&rsquo;t published yet.
+    </div>
+
+    <h2><span class="num">1</span>Add a new video</h2>
+    <p class="sectionintro">
+      Your showreels and films live in the <strong>Portfolio</strong> area.
+    </p>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <span class="what"
+          >In the left &ldquo;Content&rdquo; column, click
+          <span class="key">Portfolio</span>.</span
+        >
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <span class="what"
+          >At the top of the middle list, click the
+          <span class="key">+</span> button.</span
+        >
+        <div class="sub">A fresh, blank form opens on the right.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Title</span> - type a name for the video.</span
+        >
+        <div class="sub">
+          e.g. &ldquo;ALANXAI - AI Showreel 2026&rdquo;. This is the name people
+          see on the site.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Slug</span> - click
+          <span class="key go">Generate</span>.</span
+        >
+        <div class="sub">
+          This makes the web-address version of the title for you. You
+          don&rsquo;t need to change it.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Category</span> - open the dropdown and choose the
+          best fit.</span
+        >
+        <div class="sub">e.g. AI Video, Short Film, Aerial, Animation.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <span class="what"
+          >Add the video. Easiest way: paste your Vimeo link into the
+          <span class="key">Video URL</span> box.</span
+        >
+        <ul>
+          <li>
+            A YouTube link, or a direct MP4 link, works in the same box too.
+          </li>
+          <li>
+            The <span class="key">Vimeo URL</span> box just above also works -
+            either one is fine, you don&rsquo;t need both.
+          </li>
+          <li>
+            You only need <span class="key">Video File Upload</span> if the
+            video <em>isn&rsquo;t</em> online anywhere.
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Thumbnail</span> - the still image shown before the
+          video plays.</span
+        >
+        <div class="sub">
+          Click <span class="key">Select</span> or
+          <span class="key">Upload</span> and choose a nice frame. Optional, but
+          it looks much better with one.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Description</span> - a short line shown when
+          someone hovers over the video.</span
+        >
+        <div class="sub">Keep it brief - a sentence is plenty.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">9</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Year</span> - type the year, e.g. 2026.</span
+        >
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">10</div>
+      <div class="step-body">
+        <span class="what"
+          >Press <span class="key pub">Publish</span> (bottom-right).
+          That&rsquo;s it - it&rsquo;s now on your site.</span
+        >
+      </div>
+    </div>
+
+    <div class="callout">
+      <span class="tiptag">In short:</span> if you can watch the video online,
+      just paste its link. That&rsquo;s by far the simplest route.
+    </div>
+
+    <h2><span class="num">2</span>Write a blog post</h2>
+    <p class="sectionintro">
+      Blog posts live in the <strong>Blog</strong> area.
+    </p>
+
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <span class="what"
+          >In the left column, click <span class="key">Blog</span>, then
+          <span class="key">Blog Posts</span>.</span
+        >
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <span class="what"
+          >Click the <span class="key">+</span> at the top of the posts
+          list.</span
+        >
+        <div class="sub">A fresh, blank post opens on the right.</div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Title</span> - the headline of your post.</span
+        >
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">4</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Slug</span> - click
+          <span class="key go">Generate</span> (same as before; it builds the
+          web address for you).</span
+        >
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">5</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Published At</span> - the date shown on the
+          post.</span
+        >
+        <div class="sub">
+          It fills in today&rsquo;s date automatically - leave it unless you
+          want a different date.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">6</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Excerpt</span> - a short preview, a sentence or
+          two.</span
+        >
+        <div class="sub">
+          This is what people read in the blog list before they click in.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">7</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Main Image</span> - the big photo at the top of the
+          post.</span
+        >
+        <div class="sub">
+          Click <span class="key">Select</span> or
+          <span class="key">Upload</span>. (Optional:
+          <span class="key">Image Link URL</span> lets that image link
+          somewhere, e.g. a Vimeo video. Leave blank if not needed.)
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">8</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Primary Category</span> - pick the main
+          topic.</span
+        >
+        <div class="sub">
+          e.g. AI, Film, Aerial. Click the field and choose one.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">9</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Categories</span> - optional extra tags if the post
+          fits more than one topic.</span
+        >
+        <div class="sub">
+          Click <span class="key">+ Add item</span> and pick from the list.
+        </div>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">10</div>
+      <div class="step-body">
+        <span class="what"
+          ><span class="key">Body</span> - the main article. Type away.</span
+        >
+        <div class="sub">The little toolbar above the text lets you:</div>
+        <ul>
+          <li>
+            make text <strong>bold</strong> (<span class="key">B</span>) or
+            italic (<span class="key">i</span>)
+          </li>
+          <li>add bullet or numbered lists</li>
+          <li>add a link (the chain icon)</li>
+          <li>drop in an <span class="key">Image</span></li>
+          <li>embed a <span class="key">YouTube</span> video</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="step">
+      <div class="step-num">11</div>
+      <div class="step-body">
+        <span class="what"
+          >When you&rsquo;re happy, press
+          <span class="key pub">Publish</span>.</span
+        >
+      </div>
+    </div>
+
+    <div class="callout">
+      Your work saves itself as a draft. Close the tab and come back any time -
+      you&rsquo;ll find it waiting in the
+      <span class="key">Blog Posts</span> list with a grey dot.
+    </div>
+
+    <h2><span class="num">3</span>A quick note on Categories</h2>
+    <p class="sectionintro">
+      Categories are just the topic tags (AI, Aerial, Film,
+      Documentary&hellip;). Most of the time you&rsquo;ll simply pick from the
+      existing list.
+    </p>
+    <p style="margin: 0 0 6px 0">If you ever need a brand-new one:</p>
+    <div class="step">
+      <div class="step-num">1</div>
+      <div class="step-body">
+        <span class="what"
+          >Click <span class="key">Blog</span> &rarr;
+          <span class="key">Categories</span>.</span
+        >
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div class="step-body">
+        <span class="what"
+          >Click the <span class="key">+</span> at the top.</span
+        >
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div class="step-body">
+        <span class="what"
+          >Type a <span class="key">Title</span>, click
+          <span class="key go">Generate</span> for the slug, then
+          <span class="key pub">Publish</span>.</span
+        >
+        <div class="sub">
+          It&rsquo;ll now appear as an option whenever you tag posts and videos.
+        </div>
+      </div>
+    </div>
+
+    <h2><span class="num">4</span>Good to know</h2>
+    <dl class="faq">
+      <dt>Saving for later</dt>
+      <dd>
+        Everything saves automatically as a draft - there&rsquo;s no
+        &ldquo;save&rdquo; button to hunt for. Just close it and return when you
+        like.
+      </dd>
+
+      <dt>Editing something that&rsquo;s already live</dt>
+      <dd>
+        Click the item, make your change, and press
+        <span class="key pub">Publish</span> again to update it.
+      </dd>
+
+      <dt>Taking something down</dt>
+      <dd>
+        Open the item, click the <span class="key">&hellip;</span> (more) menu
+        near the top-right, and choose <strong>Unpublish</strong>. It leaves the
+        site but stays safely in your list.
+      </dd>
+
+      <dt>Green dot vs grey dot</dt>
+      <dd>
+        Green = live on the site. Grey = a draft, or changes waiting for you to
+        <span class="key pub">Publish</span>.
+      </dd>
+    </dl>
+
+    <div class="signoff">
+      Any questions, just give me a shout and I&rsquo;ll happily talk you
+      through it.<br />
+      - Alex
+    </div>
+  </body>
+</html>

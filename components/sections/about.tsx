@@ -3,6 +3,7 @@ import { urlFor } from '@/sanity/lib/image';
 import Image from 'next/image';
 import { PortableText } from '@portabletext/react';
 import type { CSSProperties } from 'react';
+import { normalizePortableTextWhitespace } from '@/lib/portable-text-whitespace';
 
 const aboutImagePositions = {
   top: '50% 12%',
@@ -55,7 +56,9 @@ export default function About({ settings }: { settings: SiteSettings }) {
             )}
             {settings.aboutBody && (
               <div className="text-text-secondary text-base [&>p]:mb-5 [&>p]:max-w-[620px] max-[900px]:[&>p]:max-w-full [&>p]:leading-[1.7]">
-                <PortableText value={settings.aboutBody} />
+                <PortableText
+                  value={normalizePortableTextWhitespace(settings.aboutBody)}
+                />
               </div>
             )}
             {settings.stats && settings.stats.length > 0 && (
